@@ -1116,6 +1116,11 @@ end
 					"-Wno-xor-used-as-pow",
 				}
 			end
+			if version >= 160000 then
+				buildoptions_cpp {
+					"-Wno-sfinae-incomplete",
+				}
+			end
 		end
 	end
 
