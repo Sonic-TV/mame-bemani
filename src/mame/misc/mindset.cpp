@@ -2,13 +2,14 @@
 // copyright-holders:Olivier Galibert
 
 #include "emu.h"
+
+#include "bus/rs232/rs232.h"
 #include "cpu/i86/i186.h"
 #include "cpu/mcs48/mcs48.h"
 #include "imagedev/floppy.h"
+#include "machine/ins8250.h"
 #include "machine/upd765.h"
 #include "sound/dac.h"
-#include "machine/ins8250.h"
-#include "bus/rs232/rs232.h"
 
 #include "screen.h"
 #include "softlist_dev.h"
@@ -111,13 +112,9 @@ public:
 	mindset_module(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt, bool fixed = false)
 		: mindset_module(mconfig, tag, owner, 0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(fixed);
+		set_options(std::forward<T>(opts), dflt, fixed);
 	}
 	mindset_module(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-	virtual ~mindset_module() = default;
 
 	void map(address_space &space, offs_t base, bool id);
 
@@ -156,7 +153,6 @@ void mindset_module::map(address_space &space, offs_t base, bool id)
 class mindset_sound_module: public mindset_module_interface {
 public:
 	mindset_sound_module(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-	virtual ~mindset_sound_module() = default;
 
 	virtual void map(address_map &map) override ATTR_COLD;
 	virtual void idmap(address_map &map) override ATTR_COLD;
@@ -245,16 +241,13 @@ void mindset_sound_module::device_add_mconfig(machine_config &config)
 	I8042(config, m_soundcpu, 12_MHz_XTAL/2);
 	m_soundcpu->p1_out_cb().set(FUNC(mindset_sound_module::p1_w));
 	m_soundcpu->p2_out_cb().set(FUNC(mindset_sound_module::p2_w));
-
-	SPEAKER(config, "rspeaker").front_right();
-	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "rspeaker", 0.5);
+	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, ":speaker", 0.5, 1);
 }
 
 
 class mindset_rs232_module: public mindset_module_interface {
 public:
 	mindset_rs232_module(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
-	virtual ~mindset_rs232_module() = default;
 
 	virtual void map(address_map &map) override ATTR_COLD;
 	virtual void idmap(address_map &map) override ATTR_COLD;
@@ -303,9 +296,8 @@ class mindset_state: public driver_device
 {
 public:
 	mindset_state(const machine_config &mconfig, device_type type, const char *tag);
-	virtual ~mindset_state() = default;
 
-	void mindset(machine_config &config);
+	void mindset(machine_config &config) ATTR_COLD;
 
 protected:
 	required_device<i80186_cpu_device> m_maincpu;
@@ -434,11 +426,6 @@ template<int floppy> void mindset_state::floppy_led_cb(floppy_image_device *, in
 
 void mindset_state::machine_start()
 {
-	m_floppy_leds.resolve();
-	m_red_led.resolve();
-	m_yellow_led.resolve();
-	m_green_led.resolve();
-
 	m_maincpu->space(AS_PROGRAM).cache(m_gcps);
 	for(int i=0; i<2; i++)
 		m_floppy[i] = m_fdco[i]->get_device();
@@ -1329,7 +1316,7 @@ void mindset_state::mindset(machine_config &config)
 	// Should be NTSC actually... we'll see
 	// Pretty sure the pixel clock is the 14.x one, the 12MHz one would only allow 630 pixels
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(100));
 	m_screen->set_size(751, 480);
@@ -1346,8 +1333,8 @@ void mindset_state::mindset(machine_config &config)
 	FLOPPY_CONNECTOR(config, m_fdco[0], pc_dd_floppies, "525dd", floppy_image_device::default_pc_floppy_formats);
 	FLOPPY_CONNECTOR(config, m_fdco[1], pc_dd_floppies, "525dd", floppy_image_device::default_pc_floppy_formats);
 
-	SPEAKER(config, "lspeaker").front_left();
-	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "lspeaker", 0.5);
+	SPEAKER(config, "speaker", 2).front();
+	DAC_8BIT_R2R(config, m_dac, 0).add_route(ALL_OUTPUTS, "speaker", 0.5, 0);
 
 	MINDSET_MODULE(config, "m0", mindset_modules, "stereo", false);
 	MINDSET_MODULE(config, "m1", mindset_modules, "rs232", false);

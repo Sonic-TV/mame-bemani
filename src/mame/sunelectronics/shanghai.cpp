@@ -55,6 +55,7 @@ public:
 private:
 	void shanghai_coin_w(uint8_t data);
 	void shanghai_palette(palette_device &palette) const;
+	IRQ_CALLBACK_MEMBER(vector_r);
 	INTERRUPT_GEN_MEMBER(half_vblank_irq);
 
 	void hd63484_map(address_map &map) ATTR_COLD;
@@ -98,11 +99,16 @@ void shanghai_state::shanghai_palette(palette_device &palette) const
 	}
 }
 
+IRQ_CALLBACK_MEMBER(shanghai_state::vector_r)
+{
+	return 0x80;
+}
+
 INTERRUPT_GEN_MEMBER(shanghai_state::half_vblank_irq)
 {
 	// definitely running at vblank / 2 (hd63484 irq mask not used)
 	if(m_screen->frame_number() & 1)
-		device.execute().set_input_line_and_vector(0, HOLD_LINE, 0x80); // V30
+		device.execute().set_input_line(0, HOLD_LINE); // V30
 }
 
 void shanghai_state::shanghai_coin_w(uint8_t data)
@@ -173,11 +179,11 @@ void shanghai_state::kothello_sound_map(address_map &map)
 	map(0x4008, 0x4009).rw("seibu_sound", FUNC(seibu_sound_device::ym_r), FUNC(seibu_sound_device::ym_w));
 	map(0x4010, 0x4011).r("seibu_sound", FUNC(seibu_sound_device::soundlatch_r));
 	map(0x4012, 0x4012).r("seibu_sound", FUNC(seibu_sound_device::main_data_pending_r));
-	map(0x4013, 0x4013).portr("COIN");
+	map(0x4013, 0x4013).r("seibu_sound", FUNC(seibu_sound_device::coin_r));
 	map(0x4018, 0x4019).w("seibu_sound", FUNC(seibu_sound_device::main_data_w));
 	map(0x401a, 0x401a).w("adpcm", FUNC(seibu_adpcm_device::ctl_w));
 	map(0x401b, 0x401b).w("seibu_sound", FUNC(seibu_sound_device::coin_w));
-	map(0x8000, 0xffff).bankr("seibu_bank1");
+	map(0x8000, 0xffff).bankr("seibu_bank");
 }
 
 static INPUT_PORTS_START( kothello )
@@ -409,10 +415,11 @@ void shanghai_state::shanghai(machine_config &config)
 	V30(config, m_maincpu, XTAL(16'000'000)/2); // NEC D70116C-8
 	m_maincpu->set_addrmap(AS_PROGRAM, &shanghai_state::shanghai_map);
 	m_maincpu->set_addrmap(AS_IO, &shanghai_state::shanghai_portmap);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(shanghai_state::vector_r));
 	m_maincpu->set_vblank_int("screen", FUNC(shanghai_state::half_vblank_irq));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(57);
 	//m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(384, 280);
@@ -422,7 +429,7 @@ void shanghai_state::shanghai(machine_config &config)
 
 	PALETTE(config, "palette", FUNC(shanghai_state::shanghai_palette)).set_format(palette_device::xBGR_444, 256);
 
-	HD63484(config, "hd63484", 0).set_addrmap(0, &shanghai_state::hd63484_map);
+	HD63484(config, "hd63484").set_addrmap(0, &shanghai_state::hd63484_map);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -443,10 +450,11 @@ void shanghai_state::shangha2(machine_config &config)
 	V30(config, m_maincpu, XTAL(16'000'000)/2); // ?
 	m_maincpu->set_addrmap(AS_PROGRAM, &shanghai_state::shangha2_map);
 	m_maincpu->set_addrmap(AS_IO, &shanghai_state::shangha2_portmap);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(shanghai_state::vector_r));
 	m_maincpu->set_vblank_int("screen", FUNC(shanghai_state::half_vblank_irq));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(57);
 	//m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(384, 280);
@@ -456,7 +464,7 @@ void shanghai_state::shangha2(machine_config &config)
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 256);
 
-	HD63484(config, "hd63484", 0).set_addrmap(0, &shanghai_state::hd63484_map);
+	HD63484(config, "hd63484").set_addrmap(0, &shanghai_state::hd63484_map);
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
@@ -476,6 +484,7 @@ void shanghai_state::kothello(machine_config &config)
 	// basic machine hardware
 	V30(config, m_maincpu, XTAL(16'000'000)/2); // CXQ70116
 	m_maincpu->set_addrmap(AS_PROGRAM, &shanghai_state::kothello_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(shanghai_state::vector_r));
 	m_maincpu->set_vblank_int("screen", FUNC(shanghai_state::half_vblank_irq));
 
 	z80_device &audiocpu(Z80(config, "audiocpu", XTAL(16'000'000)/4));
@@ -485,7 +494,7 @@ void shanghai_state::kothello(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(12000));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(57);
 	//m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	m_screen->set_size(384, 280);
@@ -495,7 +504,7 @@ void shanghai_state::kothello(machine_config &config)
 
 	PALETTE(config, "palette").set_format(palette_device::xBGR_444, 256);
 
-	hd63484_device &hd63484(HD63484(config, "hd63484", 0));
+	hd63484_device &hd63484(HD63484(config, "hd63484"));
 	hd63484.set_addrmap(0, &shanghai_state::hd63484_map);
 	hd63484.set_external_skew(2);
 
@@ -509,10 +518,11 @@ void shanghai_state::kothello(machine_config &config)
 	ymsnd.port_b_read_callback().set_ioport("DSW2");
 	ymsnd.add_route(ALL_OUTPUTS, "mono", 0.15);
 
-	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound", 0));
+	seibu_sound_device &seibu_sound(SEIBU_SOUND(config, "seibu_sound"));
+	seibu_sound.coin_io_callback().set_ioport("COIN");
 	seibu_sound.int_callback().set_inputline("audiocpu", 0);
 	seibu_sound.set_rom_tag("audiocpu");
-	seibu_sound.set_rombank_tag("seibu_bank1");
+	seibu_sound.set_rombank_tag("seibu_bank");
 	seibu_sound.ym_read_callback().set("ymsnd", FUNC(ym2203_device::read));
 	seibu_sound.ym_write_callback().set("ymsnd", FUNC(ym2203_device::write));
 

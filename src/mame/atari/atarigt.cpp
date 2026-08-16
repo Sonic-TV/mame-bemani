@@ -879,7 +879,7 @@ void atarigt_state::atarigt(machine_config &config)
 	m_playfield_tilemap->set_info_callback(FUNC(atarigt_state::get_playfield_tile_info));
 	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 8,8, TILEMAP_SCAN_ROWS, 64, 32).set_info_callback(FUNC(atarigt_state::get_alpha_tile_info));
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived */
 	/* the board uses a pair of GALs to determine H and V parameters */
@@ -887,10 +887,10 @@ void atarigt_state::atarigt(machine_config &config)
 	m_screen->set_screen_update(FUNC(atarigt_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(atarigt_state::video_int_write_line));
 
-	ATARI_RLE_OBJECTS(config, m_rle, 0, modesc);
+	ATARI_RLE_OBJECTS(config, m_rle, modesc);
 
 	/* sound hardware */
-	ATARI_CAGE(config, m_cage, 0);
+	ATARI_CAGE(config, m_cage);
 	m_cage->irq_handler().set(FUNC(atarigt_state::cage_irq_callback));
 }
 
@@ -902,15 +902,14 @@ void atarigt_state::atarigt_stereo(machine_config &config)
 	// 3 Channel output directly from CAGE or through motherboard JAMMA output
 	// based on dedicated cabinet configuration;
 	// 'universal' kit supports mono and stereo, with/without subwoofer.
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	SPEAKER(config, "subwoofer").front_floor(); // Next to the coin door at dedicated cabinet, just silence for now (not implemented)
+	SPEAKER(config, "speaker", 2).front();
+	SPEAKER(config, "subwoofer").lfe(); // Next to the coin door at dedicated cabinet, just silence for now (not implemented)
 
 	// TODO: correct? sound board has only 1 DAC populated.
-	m_cage->add_route(0, "rspeaker", 1.0);
-	m_cage->add_route(1, "lspeaker", 1.0);
-	m_cage->add_route(2, "lspeaker", 1.0);
-	m_cage->add_route(3, "rspeaker", 1.0);
+	m_cage->add_route(0, "speaker", 1.0, 1);
+	m_cage->add_route(1, "speaker", 1.0, 0);
+	m_cage->add_route(2, "speaker", 1.0, 0);
+	m_cage->add_route(3, "speaker", 1.0, 1);
 	m_cage->add_route(4, "subwoofer", 1.0);
 }
 
@@ -925,17 +924,14 @@ void atarigt_state::tmek(machine_config &config)
 	m_adc->in_callback<7>().set_ioport("AN3");
 
 	// 5 Channel output (4 Channel input connected to Quad Amp PCB)
-	SPEAKER(config, "flspeaker").front_left();
-	SPEAKER(config, "frspeaker").front_right();
-	SPEAKER(config, "rlspeaker").headrest_left();
-	SPEAKER(config, "rrspeaker").headrest_right();
-	//SPEAKER(config, "subwoofer").seat(); Not implemented, Quad Amp PCB output;
+	SPEAKER(config, "speaker", 4).front().headrest_left(2).headrest_right(3);
+	//SPEAKER(config, "subwoofer").lfe(); Not implemented, Quad Amp PCB output;
 
 	m_cage->set_speedup(0x4fad);
-	m_cage->add_route(0, "frspeaker", 1.0); // Foward Right
-	m_cage->add_route(1, "rlspeaker", 1.0); // Back Left
-	m_cage->add_route(2, "flspeaker", 1.0); // Foward Left
-	m_cage->add_route(3, "rrspeaker", 1.0); // Back Right
+	m_cage->add_route(0, "speaker", 1.0, 1); // Foward Right
+	m_cage->add_route(1, "speaker", 1.0, 2); // Back Left
+	m_cage->add_route(2, "speaker", 1.0, 0); // Foward Left
+	m_cage->add_route(3, "speaker", 1.0, 3); // Back Right
 }
 
 void atarigt_state::primrage(machine_config &config)

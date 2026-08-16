@@ -1,6 +1,5 @@
 // license:BSD-3-Clause
 // copyright-holders:R. Belmont
-/* c140.h */
 
 #ifndef MAME_SOUND_C140_H
 #define MAME_SOUND_C140_H
@@ -44,7 +43,7 @@ protected:
 	virtual void rom_bank_pre_change() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	virtual int find_sample(int adrs, int bank, int voice);
 
@@ -118,11 +117,12 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	virtual int find_sample(int adrs, int bank, int voice) override;
 
 	virtual const inline bool ch_mulaw(C140_VOICE *v) override { return BIT(v->mode, 0); }
+
 private:
 	// bit 1 used, unknown
 	const inline bool ch_noise(C140_VOICE *v) { return BIT(v->mode, 2); }

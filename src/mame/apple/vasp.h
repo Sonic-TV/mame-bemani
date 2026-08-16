@@ -6,10 +6,10 @@
 
 #pragma once
 
-#include "pseudovia.h"
-
 #include "machine/6522via.h"
+#include "machine/pseudovia.h"
 #include "sound/asc.h"
+
 #include "emupal.h"
 #include "speaker.h"
 #include "screen.h"
@@ -54,7 +54,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 	virtual ioport_constructor device_input_ports() const override ATTR_COLD;
 
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	devcb_write_line write_pb4, write_pb5, write_cb2, write_hdsel;
@@ -66,7 +66,7 @@ private:
 	required_device<palette_device> m_palette;
 	required_device<via6522_device> m_via1;
 	required_device<pseudovia_device> m_pseudovia;
-	required_device<asc_device> m_asc;
+	required_device<asc_base_device> m_asc;
 	required_region_ptr<u32> m_rom;
 
 	std::unique_ptr<u32[]> m_vram;

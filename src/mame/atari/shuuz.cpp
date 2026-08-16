@@ -156,48 +156,53 @@ uint32_t shuuz_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap,
 
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_vad->mob().bitmap();
-	for (const sparse_dirty_rect *rect = m_vad->mob().first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->top(); y <= rect->bottom(); y++)
-		{
-			uint16_t const *const mo = &mobitmap.pix(y);
-			uint16_t *const pf = &bitmap.pix(y);
-			for (int x = rect->left(); x <= rect->right(); x++)
+	m_vad->mob().iterate_dirty_rects(
+			cliprect,
+			[&bitmap, &mobitmap] (rectangle const &rect)
 			{
-				if (mo[x] != 0xffff)
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
-					/* verified from the GALs on the real PCB; equations follow
-					 *
-					 *      --- O13 is 1 if (PFS7-4 == 0xf)
-					 *      O13=PFS6*PFS7*(PFS5&PFS4)
-					 *
-					 *      --- PF/M is 1 if MOs have priority, or 0 if playfield has priority
-					 *      MO/PF=!PFS7*!(LBD7&LBD6)*!M1*!O13
-					 *         +!PFS7*!(LBD7&LBD6)*!M2*!O13
-					 *         +!PFS7*!(LBD7&LBD6)*!M3*!O13
-					 *         +PFS7*(LBD7&LBD6)*!M1*!O13
-					 *         +PFS7*(LBD7&LBD6)*!M2*!O13
-					 *         +PFS7*(LBD7&LBD6)*!M3*!O13
-					 *
-					 */
-
-					// This is based on observations, and not verified against schematics and GAL equations.
-					// TODO:
-					// * Locate schematics for (or trace out) video mixing section.
-					// * Obtain equations for video mixing GALs.
-					bool const o13 = (pf[x] & 0xf0) == 0xf0;
-					bool const mopf = ((pf[x] & 0x80) ? ((mo[x] & 0xc0) == 0xc0) : ((mo[x] & 0xc0) != 0xc0)) && !o13;
-
-					// if MO/PF is asserted, we draw the MO
-					if (mopf)
+					uint16_t const *const mo = &mobitmap.pix(y);
+					uint16_t *const pf = &bitmap.pix(y);
+					for (int x = rect.left(); x <= rect.right(); x++)
 					{
-						if (mo[x] & 0x0e)       // solid colors
-							pf[x] = mo[x];
-						else if (mo[x] & 0x01)  // shadows
-							pf[x] |= 0x200;
+						if (mo[x] != 0xffff)
+						{
+							/* verified from the GALs on the real PCB; equations follow
+							 *
+							 *      --- O13 is 1 if (PFS7-4 == 0xf)
+							 *      O13=PFS6*PFS7*(PFS5&PFS4)
+							 *
+							 *      --- PF/M is 1 if MOs have priority, or 0 if playfield has priority
+							 *      MO/PF=!PFS7*!(LBD7&LBD6)*!M1*!O13
+							 *         +!PFS7*!(LBD7&LBD6)*!M2*!O13
+							 *         +!PFS7*!(LBD7&LBD6)*!M3*!O13
+							 *         +PFS7*(LBD7&LBD6)*!M1*!O13
+							 *         +PFS7*(LBD7&LBD6)*!M2*!O13
+							 *         +PFS7*(LBD7&LBD6)*!M3*!O13
+							 *
+							 */
+
+							// This is based on observations, and not verified against schematics and GAL equations.
+							// TODO:
+							// * Locate schematics for (or trace out) video mixing section.
+							// * Obtain equations for video mixing GALs.
+							bool const o13 = (pf[x] & 0xf0) == 0xf0;
+							bool const mopf = ((pf[x] & 0x80) ? ((mo[x] & 0xc0) == 0xc0) : ((mo[x] & 0xc0) != 0xc0)) && !o13;
+
+							// if MO/PF is asserted, we draw the MO
+							if (mopf)
+							{
+								if (mo[x] & 0x0e)       // solid colors
+									pf[x] = mo[x];
+								else if (mo[x] & 0x01)  // shadows
+									pf[x] |= 0x200;
+							}
+						}
 					}
 				}
-			}
-		}
+			});
+
 	return 0;
 }
 
@@ -405,12 +410,12 @@ void shuuz_state::shuuz(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_shuuz);
 	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 1024);
 
-	ATARI_VAD(config, m_vad, 0, m_screen);
+	ATARI_VAD(config, m_vad, m_screen);
 	m_vad->scanline_int_cb().set_inputline(m_maincpu, M68K_IRQ_4);
 	TILEMAP(config, "vad:playfield", m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 62, 64).set_info_callback(FUNC(shuuz_state::get_playfield_tile_info));
-	ATARI_MOTION_OBJECTS(config, "vad:mob", 0, m_screen, shuuz_state::s_mob_config).set_gfxdecode(m_gfxdecode);
+	ATARI_MOTION_OBJECTS(config, "vad:mob", m_screen, shuuz_state::s_mob_config).set_gfxdecode(m_gfxdecode);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived
 	   the board uses a VAD chip to generate video signals */

@@ -270,13 +270,12 @@ public:
 	{
 	}
 
-	void dx100(machine_config &config);
+	void dx100(machine_config &config) ATTR_COLD;
 
-	void led_w(int state)                  { m_led = state; }
+	void led_w(int state) { m_led = state; }
 	ioport_value midi_in_r() { return m_midi_in; }
 
 protected:
-	virtual void driver_start() override;
 	virtual void machine_start() override ATTR_COLD;
 	virtual void machine_reset() override ATTR_COLD;
 
@@ -301,11 +300,6 @@ private:
 
 	required_device<cassette_image_device> m_cassette;
 };
-
-void yamaha_dx100_state::driver_start()
-{
-	m_led.resolve();
-}
 
 void yamaha_dx100_state::machine_start()
 {
@@ -612,7 +606,7 @@ void yamaha_dx100_state::dx100(machine_config &config)
 	MIDI_PORT(config, "mdin", midiin_slot, "midiin").rxd_handler().set([this](int state) { m_midi_in = state; });
 	MIDI_PORT(config, "mdout", midiout_slot, "midiout");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_screen_update("lcdc", FUNC(hd44780_device::screen_update));
@@ -626,12 +620,11 @@ void yamaha_dx100_state::dx100(machine_config &config)
 	lcdc.set_lcd_size(1, 16);
 	lcdc.set_pixel_update_cb(FUNC(yamaha_dx100_state::lcd_pixel_update));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2164_device &ymsnd(YM2164(config, "ymsnd", 7.15909_MHz_XTAL / 2)); // with YM3014 DAC
-	ymsnd.add_route(0, "lspeaker", 0.60);
-	ymsnd.add_route(1, "rspeaker", 0.60);
+	ymsnd.add_route(0, "speaker", 0.60, 0);
+	ymsnd.add_route(1, "speaker", 0.60, 1);
 
 	CASSETTE(config, m_cassette);
 	m_cassette->set_default_state(CASSETTE_STOPPED);

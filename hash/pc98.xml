@@ -3,7 +3,7 @@
 <!--
 license:CC0-1.0
 -->
-<softwarelist name="pc98" description="NEC PC-9801 disk images">
+<softwarelist name="pc98" description="NEC PC-98 disk images">
 <!--
 
   This software list collects disks from many different sources, including the 13GB pack with ~90 rar files floating around since 2011
@@ -109,11 +109,29 @@ Uses [EGC], broken GFXs
 		</part>
 	</software>
 
-	<software name="n88bas61" supported="partial">
-		<description>N88 Disk BASIC v6.1</description>
-		<year>1983</year>
+	<!-- 2D format ought to exist -->
+	<!-- https://sanguisorba.github.io/basic/n88.htm -->
+	<software name="n88bas20" supported="partial">
+		<description>N88 Disk BASIC(86) (v2.0, 2HD)</description>
+		<year>1983?</year>
 		<publisher>NEC</publisher>
 		<notes><![CDATA[
+Identify exact type, PC-98H42(K)?
+Not extensively tested
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1086448">
+				<rom name="n88-nihongo basic(86) v2.0 (system disk).d88" size="1086448" crc="14f2043c" sha1="cc3b769165f233175ecd85c59284e5ae91b1ff98" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="n88bas61" supported="partial">
+		<description>N88 Disk BASIC(86) (v6.1)</description>
+		<year>1983?</year>
+		<publisher>NEC</publisher>
+		<notes><![CDATA[
+Identify exact type
 Utility disk file "menu." has half height box lines
 Not extensively tested
 ]]></notes>
@@ -1252,6 +1270,28 @@ Utility disk file "BMENU." sports ugly GFX cyan fills (especially noticeable whe
 		</part>
 	</software>
 
+	<software name="win95bem">
+		<description>Windows 95 OSR2 (Emergency Boot Disk)</description>
+		<year>1996</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="microsoft windows 95 osr2 (emergency boot disk).hdm" size="1261568" crc="d4e9cccb" sha1="e8c0c231435c0602dbf111342d041d66d004fab9" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="win98sem">
+		<description>Windows 98 Second Edition (Emergency Boot Disk)</description>
+		<year>1999</year>
+		<publisher>Microsoft</publisher>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="microsoft windows 98se (emergency boot disk).hdm" size="1261568" crc="a4ea5398" sha1="0f70dc3683ca0d84ea97a06ca6addf1d31a3d3c8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- !Programming IDEs -->
 
 	<software name="cobol">
@@ -1464,7 +1504,7 @@ Not extensively tested, running game start will moan about missing files
 	</software>
 
 	<software name="ldb_advm" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Adventure Tsukuuru 98 (5.25&quot; Disks)</description>
+		<description>LOGiN Disk &amp; Book Series - Adventure Tsukuuru 98 (5.25&quot; disks)</description>
 		<year>1992</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1482,7 +1522,7 @@ Not extensively tested, running game start will moan about missing files
 	</software>
 
 	<software name="ldb_advm35" cloneof="ldb_advm" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Adventure Tsukuuru 98 (3.5&quot; Disks)</description>
+		<description>LOGiN Disk &amp; Book Series - Adventure Tsukuuru 98 (3.5&quot; disks)</description>
 		<year>1992</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1500,7 +1540,7 @@ Not extensively tested, running game start will moan about missing files
 	</software>
 
 	<software name="ldb_char" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Character Tsukuuru 98 (5.25&quot; Disks)</description>
+		<description>LOGiN Disk &amp; Book Series - Character Tsukuuru 98 (5.25&quot; disks)</description>
 		<year>1992</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1518,7 +1558,7 @@ Not extensively tested, running game start will moan about missing files
 	</software>
 
 	<software name="ldb_char35" cloneof="ldb_char" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Character Tsukuuru 98 (3.5&quot; Disks)</description>
+		<description>LOGiN Disk &amp; Book Series - Character Tsukuuru 98 (3.5&quot; disks)</description>
 		<year>1994</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1751,7 +1791,7 @@ Not extensively tested, running game start will moan about missing files
 	</software>
 
 	<software name="ldb_draw" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Drawing Tool (5.25&quot; Disk)</description>
+		<description>LOGiN Disk &amp; Book Series - Drawing Tool (5.25&quot; disk)</description>
 		<year>1992</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1763,7 +1803,7 @@ Not extensively tested, running game start will moan about missing files
 
 
 	<software name="ldb_draw35" cloneof="ldb_draw" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Drawing Tool (3.5&quot; Disk)</description>
+		<description>LOGiN Disk &amp; Book Series - Drawing Tool (3.5&quot; disk)</description>
 		<year>1992</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -1775,7 +1815,7 @@ Not extensively tested, running game start will moan about missing files
 
 	<!-- TODO: isbn supposedly 978-4756108562, which should be different depending on if they really released as separate formats -->
 	<software name="ldb_polm">
-		<description>LOGiN Disk &amp; Book Series - Polygon Modeling Tsukuuru (5.25&quot; Disk)</description>
+		<description>LOGiN Disk &amp; Book Series - Polygon Modeling Tsukuuru (5.25&quot; disk)</description>
 		<year>1992</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="ポリゴンモデリングツクール" />
@@ -1788,7 +1828,7 @@ Not extensively tested, running game start will moan about missing files
 
 	<!-- TODO: despite filename this doesn't look 3.5" -->
 	<software name="ldb_polm35" cloneof="ldb_polm">
-		<description>LOGiN Disk &amp; Book Series - Polygon Modeling Tsukuuru (5.25&quot; Disk, alt)</description>
+		<description>LOGiN Disk &amp; Book Series - Polygon Modeling Tsukuuru (5.25&quot; disk, alt)</description>
 		<year>1992</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="ポリゴンモデリングツクール" />
@@ -1800,7 +1840,7 @@ Not extensively tested, running game start will moan about missing files
 	</software>
 
 	<software name="ldb_poly" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Polygon Shooting Tsukuuru (5.25&quot; Disk)</description>
+		<description>LOGiN Disk &amp; Book Series - Polygon Shooting Tsukuuru (5.25&quot; disk)</description>
 		<year>1993?</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -1813,7 +1853,7 @@ Not extensively tested, running game start will moan about missing files
 
 	<!-- TODO: again filename hints as a 3.5" version when it's not, cfr. ldb_polm -->
 	<software name="ldb_poly35" cloneof="ldb_poly" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Polygon Shooting Tsukuuru (5.25&quot; Disk, alt)</description>
+		<description>LOGiN Disk &amp; Book Series - Polygon Shooting Tsukuuru (5.25&quot; disk, alt)</description>
 		<year>1993?</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop2" interface="floppy_5_25">
@@ -1838,6 +1878,40 @@ Moans while executing ISD.EXE, r/w I/O ports $d0, expecting a device to be conne
 			</dataarea>
 		</part>
 	</software>
+
+	<!-- "Multi Paint System: Otonoshimi Set 1" known to exist, possibly very similar to this -->
+	<software name="mpssfsp" supported="partial">
+		<description>Multi Paint System: Secret Fun Set Plus</description>
+		<year>1995</year>
+		<publisher>シーラボ (C-lab)</publisher>
+		<notes><![CDATA[
+Expansion disk for pc98_flop_orig:mps
+Has [EGC] issues during auto demo: leaves trails when kanji drawing, some closing windows fails to clear completely.
+Teal Disk unchecked: has various drivers for printers and Wacom serial tablets cfr. DOC folder
+]]></notes>
+		<info name="alt_title" value="マルチペイントシステム マル秘お楽しみセット" />
+		<info name="usage" value="Requires HDD DOS install. Auto Demo disk: run demo.bat" />
+		<!-- TODO: can't load as 3.5", looks suspicious -->
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Pink Disk (Auto Demo)"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="mpspink.hdm" size="1261568" crc="30e9c621" sha1="6690ee1f6f8af3fa40c29bd86ebed90b9a827a50" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Blue Disk (Art/CG)"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="mpsblue.hdm" size="1261568" crc="4a2c117f" sha1="352f03bd0f01d55b6b5c5684db2a90991884aca7" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Teal Disk (Expansion/Install)"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="mpsteal.hdm" size="1261568" crc="66e1987f" sha1="fe268885ccc9c16cd5fe94bd7d4a61ff6e537968" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 
 <!-- !Sound players/makers (MIDI Applications et al.) -->
 
@@ -2549,6 +2623,29 @@ Not extensively tested
 
 <!-- !Generic Applications -->
 
+	<software name="98eiwa">
+		<!-- Origin: Neo Kobe Collection -->
+		<description>98 Eiwa Jiten</description>
+		<year>1987</year>
+		<publisher>ハイスコア (Hi-Score)</publisher>
+		<notes><![CDATA[
+English-Japanese Dictionary
+]]></notes>
+		<info name="alt_title" value="98英和辞典" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="98 eiwa jiten (disk 1).hdm" size="1261568" crc="3377cdc0" sha1="aef25da61971675ae5db6cd68ff8ecabc65e5225" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="98 eiwa jiten (disk 2).hdm" size="1261568" crc="61396602" sha1="9f7e01c08b477403d04f32a165cd38d25775c059" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="98lespro" supported="no">
 		<description>98 Lesson Pro</description>
 		<year>1990</year>
@@ -2926,6 +3023,20 @@ Fails two CONFIG.SYS lines, errors out when executing N88BASIC /F:12 /T:RUN"INIT
 		</part>
 	</software>
 
+	<software name="versalnk" supported="no">
+		<description>Versa-Link</description>
+		<year>1986</year>
+		<publisher>Cosmo Sys. Lab.</publisher>
+		<notes><![CDATA[
+[Serial] and [modem] application
+]]></notes>
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1261568">
+				<rom name="versa_link.hdm" size="1261568" crc="6d05987c" sha1="e3dd6b3d1c36bf4a82ad05d747917a3556d06bd8" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 <!-- !Artbooks -->
 
 	<software name="agumixsl" supported="no">
@@ -3038,7 +3149,7 @@ double height bitmap on non-interlace mode
 		<publisher>ラブ・ガン (Love Gun)</publisher>
 		<info name="alt_title" value="デンジャラス トイズ" />
 		<info name="release" value="19961213" />
-		<info name="usage" value="Required HDD install from DOS, requires 520K minimum of conventional memory" />
+		<info name="usage" value="Requires HDD install from DOS, requires 520K minimum of conventional memory" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1261568">
@@ -3548,26 +3659,6 @@ Throws a "excution file has been renamed" warning during MEGDOS boot
 		<part name="flop2" interface="floppy_5_25">
 			<dataarea name="flop" size="746496">
 				<rom name="98 note no hissu aminosan [b].img" size="746496" crc="ee60cb77" sha1="5540f386bb708cff61e41387c9760184083fcad8" offset="0" status="baddump" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="98eiwa">
-		<!-- Origin: Neo Kobe Collection -->
-		<description>98 Eiwa Jiten</description>
-		<year>1987</year>
-		<publisher>ハイスコア (Hi-Score)</publisher>
-		<info name="alt_title" value="98英和辞典" />
-		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="98 eiwa jiten (disk 1).hdm" size="1261568" crc="3377cdc0" sha1="aef25da61971675ae5db6cd68ff8ecabc65e5225" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="1261568">
-				<rom name="98 eiwa jiten (disk 2).hdm" size="1261568" crc="61396602" sha1="9f7e01c08b477403d04f32a165cd38d25775c059" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -4120,7 +4211,7 @@ Hangs after entering name on VM class
 	</software>
 
 	<software name="poolrad">
-		<description>Advanced Dungeons &amp; Dragons - Pool of Radiance</description>
+		<description>Advanced Dungeons &amp; Dragons: Pool of Radiance</description>
 		<year>1989</year>
 		<publisher>ポニーキャニオン (Pony Canyon)</publisher>
 		<info name="alt_title" value="ＡＤ＆Ｄ プール オブ レイディアンス" />
@@ -4184,15 +4275,18 @@ Hangs after entering name on VM class
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<notes><![CDATA[
 2D disk, requires [PC80S31] interface
+Hangs at PC=1FEE8 after executing int 1b with AX=4650 BX=0100 CX=0102 DX=0110, boots if patched
 ]]></notes>
 		<info name="alt_title" value="アドベンチャーランド" />
 		<info name="release" value="198407xx" />
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Boot Disk"/>
 			<dataarea name="flop" size="348848">
 				<rom name="boot.d88" size="348848" crc="f914c48b" sha1="446a234f36465708df4ffabc0848b84a45cf6426" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Game Disk"/>
 			<dataarea name="flop" size="344496">
 				<rom name="adventureland.d88" size="344496" crc="eb33a2b4" sha1="63c84329954624c0d1b61c303412353418820b99" offset="0" />
 			</dataarea>
@@ -4368,11 +4462,10 @@ fails to self boot, dos must be loaded first
 		<year>1993</year>
 		<publisher>サムシンググッド (Something Good)</publisher>
 		<notes><![CDATA[
-Requires 3.5" floppy emulation
+Fails autobooting (has CONFIG.SYS/AUTOEXEC.BAT)
 ]]></notes>
 		<info name="alt_title" value="ＡＩ将棋" />
 		<info name="release" value="19931205" />
-		<!-- TODO: apparently not autobootable, may require DOS -->
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
 				<rom name="main.fdi" size="1478656" crc="5e656df1" sha1="4182f3854eb510df600df606dc6cd949d84adc8c" offset="0" />
@@ -4904,11 +4997,14 @@ Requires 3.5" floppy emulation
 		</part>
 	</software>
 
-	<software name="albatros">
+	<software name="albatros" supported="partial">
 		<!-- Origin: Neo Kobe Collection -->
 		<description>Albatross</description>
 		<year>1986</year>
 		<publisher>日本テレネット (Nihon Telenet)</publisher>
+		<notes><![CDATA[
+Has optional [PC-9801-14] support
+]]></notes>
 		<info name="alt_title" value="アルバトロス" />
 		<info name="usage" value="Runs best on 8086-based machines (e.g. PC-9801F)" />
 		<part name="flop1" interface="floppy_5_25">
@@ -8514,12 +8610,16 @@ Errors with "Put the retail disk A into the drive", [FDC] chrn=(2, 1, -17, 512)
 		</part>
 	</software>
 
-	<!-- Black screen on boot -->
-	<software name="blckonyx">
+	<software name="blckonyx" supported="no">
 		<description>The Black Onyx</description>
 		<year>1984</year>
 		<publisher>B·P·S (Bullet-Proof Software)</publisher>
+		<notes><![CDATA[
+For pc9801f or pc9801vm
+Not extensively tested (language barrier, requires an user disk save after character creation)
+]]></notes>
 		<info name="alt_title" value="ザ・ブラックオニキス" />
+		<info name="usage" value="Needs floppy 2DD density select dip enabled. Strike CR at How Many Files, load &quot;START&quot; then run" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="688304">
 				<rom name="onyx.d88" size="688304" crc="5187be3d" sha1="9c68c5f8fb97f14a9f8f8e8f96d688dd2c8db2f8" offset="0" />
@@ -8629,16 +8729,24 @@ Errors with "Put the retail disk A into the drive", [FDC] chrn=(2, 1, -17, 512)
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<notes><![CDATA[
 2D disk, requires [PC80S31] interface
+Hangs at PC=1FEE8 after executing int 1b with AX=4650 BX=0100 CX=0102 DX=0110, boots if patched
 ]]></notes>
 		<info name="alt_title" value="ブラックプールの剣" />
 		<info name="release" value="198401xx" />
+		<info name="usage" value="Start with Boot and Disk B in 2D drives otherwise corrupted graphics will happen once loaded" />
 		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="Boot Disk"/>
+			<dataarea name="flop" size="348848">
+				<rom name="boot.d88" size="348848" crc="f914c48b" sha1="446a234f36465708df4ffabc0848b84a45cf6426" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="344496">
 				<rom name="disk a.d88" size="344496" crc="21eca713" sha1="2d11670eb8cb269bc7777a7237eb44b48263f691" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop2" interface="floppy_5_25">
+		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="348848">
 				<rom name="disk b.d88" size="348848" crc="05529277" sha1="409083c4b4bad399d64d931f2f835ef47a858837" offset="0" />
@@ -8963,7 +9071,6 @@ DAC1BIT sounds awful on anything, cfr. title screen (tested VM class, RS class a
 		</part>
 	</software>
 
-	<!-- sometimes keyboard doesn't recognize key ups -->
 	<software name="bokosuka" supported="no">
 		<description>Bokosuka Wars</description>
 		<year>1985</year>
@@ -11259,19 +11366,15 @@ Has optional [RS-MIDI] sound support
 	</software>
 
 	<!-- TODO: non-bootable .hdm version known to exist (will Abort Retry Fail when dir from MS-DOS) -->
-	<software name="chittyt" supported="no">
+	<software name="chittyt" supported="yes">
 		<description>Chitty Chitty Train (.fdi installed hack)</description>
 		<year>1993</year>
 		<publisher>ビッツー (Bit²)</publisher>
-		<notes><![CDATA[
-Requires 3.5" floppy emulation
-Throws MSDOS.SYS error when booted from pc9821 class machines, I/O Error otherwise
-]]></notes>
 		<info name="alt_title" value="チキチキトレイン" />
 		<info name="release" value="19930811" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
-				<rom name="chitty chitty train (1993)(bit^2).fdi" size="1478656" crc="af527d06" sha1="53b4e459c9eab0c4573021fa6a724125e5e64a8e" offset="0" />
+				<rom name="chitty chitty train (1993)(bit^2).fdi" size="1478656" crc="af527d06" sha1="53b4e459c9eab0c4573021fa6a724125e5e64a8e" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -11376,10 +11479,13 @@ Game directory on autobootable disk
 		</part>
 	</software>
 
-	<software name="macroscp">
-		<description>Choujikuu Yousai Macross - Complete Pack HD Senyou</description>
+	<software name="macroscp" supported="partial">
+		<description>Choujikuu Yousai Macross - SkullLeader Complete Pack HD Senyou</description>
 		<year>1995</year>
 		<publisher>ファミリーソフト (Family Soft)</publisher>
+		<notes><![CDATA[
+Battle gameplay leaves trails with the mouse, [EGC]?
+]]></notes>
 		<info name="alt_title" value="超時空要塞マクロス スカル・リーダー コンプリートパック ＨＤ専用" />
 		<info name="release" value="19950714" />
 		<part name="flop1" interface="floppy_5_25">
@@ -12557,8 +12663,10 @@ Course names draws a full square [kanji] block between nation and "GP" (verify)
 		<publisher>スタークラフト (Starcraft)</publisher>
 		<notes><![CDATA[
 2D disk, requires [PC80S31] interface
+Hangs at PC=1FEE8 after executing int 1b with AX=4650 BX=0100 CX=0102 DX=0110, boots if patched
 ]]></notes>
 		<info name="release" value="198310xx" />
+		<info name="usage" value="Start with Boot and Disk B in 2D drives otherwise wont load after prompt" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Boot Disk"/>
 			<dataarea name="flop" size="348848">
@@ -12750,6 +12858,7 @@ Fails to boot with "E4" error, access [FDC] chrn=(0, 0, 1, 512)
 Throws "E>" error with chrn=(0, 1, 1, 512) in 2dd mode
 ]]></notes>
 		<info name="alt_title" value="クルーズ チェイサー ブラスティー" />
+		<info name="release" value="198611xx" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="741376">
@@ -15652,12 +15761,15 @@ Is it really game like intended? [FDC] investigation required
 		</part>
 	</software>
 
+	<!-- TODO: Krugman set is two disks, huh? -->
 	<software name="dennosui">
 		<description>Dennou Suikoden</description>
 		<year>1987</year>
 		<publisher>HOT・B</publisher>
 		<info name="alt_title" value="電脳水滸伝" />
 		<info name="release" value="19870112" />
+		<!-- GA夢 -->
+		<info name="developer" value="Gamu" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="dennou suikoden.hdm" size="1261568" crc="b12425f4" sha1="69ad2baaf14261ade4b3fba70c75cd587440cecf" offset="0" />
@@ -16696,10 +16808,14 @@ Optional [AMD-98] support, no sound (uses PIT registers)
 		</part>
 	</software>
 
-	<software name="doom">
+	<software name="doom" supported="partial">
 		<description>Doom</description>
 		<year>1994</year>
 		<publisher>イマジニア (Imagineer)</publisher>
+		<notes><![CDATA[
+No DAC sound for [PC9801-86]
+Needs DSP hookup for [SB16]
+]]></notes>
 		<info name="release" value="19941209" />
 		<info name="usage" value="Requires HDD installation and a PC-9821 computer. Run INSTALL.EXE from DOS." />
 		<part name="flop1" interface="floppy_5_25">
@@ -16939,7 +17055,6 @@ Optional [AMD-98] support, no sound (uses PIT registers)
 Slightly too fast for VM class
 ]]></notes>
 		<info name="alt_title" value="ドアドア" />
-		<info name="release" value="" />
 		<info name="usage" value="Needs floppy 2DD density select dip enabled" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="697008">
@@ -18481,18 +18596,18 @@ Ingame selections runs too fast, either with [keyboard] or [joystick] (verify)
 		</part>
 	</software>
 
-	<software name="edge" supported="no">
+	<!-- 3.5" version known to exist -->
+	<software name="edge" supported="partial">
 		<description>Edge</description>
 		<year>1993</year>
 		<publisher>テイジイエル (TGL)</publisher>
 		<notes><![CDATA[
-Doesn't recognize disk changes (regressed)
-Has gfx glitch when intro scrolls to top-left
-User disk creation screen is offset
-Hangs during intro (regression?)
+Has small line glitch with opening (5th option in main menu), top-right (verify)
+Confirm disks D-F
 ]]></notes>
 		<info name="alt_title" value="エッジ" />
 		<info name="release" value="19930115" />
+		<!-- TODO: at least Disk B and C were swapped -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1281968">
@@ -18502,13 +18617,13 @@ Hangs during intro (regression?)
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk B"/>
 			<dataarea name="flop" size="1281968">
-				<rom name="edgeb.d88" size="1281968" crc="32537419" sha1="8897049f5e9dea9920476d1931bfc9167bb4032f" offset="0" />
+				<rom name="edgec.d88" size="1281968" crc="8685b9f4" sha1="69f3dfc52339d14555537ba4ca7c267ca0e05297" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
 			<feature name="part_id" value="Disk C"/>
 			<dataarea name="flop" size="1281968">
-				<rom name="edgec.d88" size="1281968" crc="8685b9f4" sha1="69f3dfc52339d14555537ba4ca7c267ca0e05297" offset="0" />
+				<rom name="edgeb.d88" size="1281968" crc="32537419" sha1="8897049f5e9dea9920476d1931bfc9167bb4032f" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop4" interface="floppy_5_25">
@@ -19012,11 +19127,13 @@ Disk swaps doesn't work, [FDC] keeps recalibrate and sense interrupt status
 		</part>
 	</software>
 
-	<!-- Can't create the player disk -->
 	<software name="elysion" supported="no">
 		<description>Elysion (2HD version)</description>
 		<year>1986</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
+		<notes><![CDATA[
+Can't create the player disk
+]]></notes>
 		<info name="alt_title" value="エリュシオン" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
@@ -19030,6 +19147,9 @@ Disk swaps doesn't work, [FDC] keeps recalibrate and sense interrupt status
 		<description>Elysion (2DD version)</description>
 		<year>1986</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
+		<notes><![CDATA[
+Hangs while booting
+]]></notes>
 		<info name="alt_title" value="エリュシオン" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk"/>
@@ -19143,10 +19263,9 @@ Disk swaps doesn't work, [FDC] keeps recalibrate and sense interrupt status
 		</part>
 	</software>
 
-	<!-- This probably requires 3.5" floppy emulation -->
-	<software name="entax" supported="no">
+	<software name="entax" supported="yes">
 		<description>Entax</description>
-		<year>19??</year>
+		<year>1995?</year>
 		<publisher>総合ビジネスアシスト (ABA)</publisher>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
@@ -20862,19 +20981,21 @@ Black screen [FDC] keeps reading chrn=(0, 0, 3, 256) in 2dd mode
 		</part>
 	</software>
 
-	<software name="flashb" supported="no">
+	<software name="flashb" supported="partial">
 		<description>Flashback</description>
 		<year>1994</year>
 		<publisher>ビクターエンタテインメント (Victor Entertainment)</publisher>
 		<notes><![CDATA[
-Black screen, around PC=1fc76. Extensively uses 9821 [PEGC] MMIO.
+16 color mode has a column to the right shifted by one pixel on intro and gameplay
+Optional support for unsupported [graphic] and [sound] options
 ]]></notes>
 		<info name="alt_title" value="フラッシュバック" />
 		<info name="release" value="19940422" />
+		<info name="usage" value="Requires HDD DOS install" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
-			<dataarea name="flop" size="1329680">
-				<rom name="flashback_1.nfd" size="1329680" crc="bb415b0a" sha1="b42641e175060840c0df43e2319bc4ea75d29d89" offset="0" />
+			<dataarea name="flop" size="3444545">
+				<rom name="Flashback (Disk A).mfm" size="3444545" crc="d1a3f821" sha1="d330ccb373b16e8df662791427e265dad1693025" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
@@ -21799,10 +21920,11 @@ Reset machine after selecting option 1 "FUNNY start"
 	</software>
 
 	<software name="nadiaopt">
-		<description>Fushigi no Umi no Nadia - Option Disk</description>
+		<description>Fushigi no Umi no Nadia - Music Disk</description>
 		<year>1992?</year>
 		<publisher>ガイナックス (Gainax)</publisher>
-		<info name="alt_title" value="ふしぎの海のナディア オプション" />
+		<info name="alt_title" value="ふしぎの海のナディア ミュージックディスク" />
+		<!-- TODO: available in 3.5" format only? -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="nadia_op.fdi" size="1265664" crc="a31924b2" sha1="0c21f92eac460648831e1331a8437462553bde37" offset="0" />
@@ -21912,12 +22034,12 @@ Non-functional in gameplay, random tileset (verify, should be fixed)
 		</part>
 	</software>
 
-	<software name="gaiflame" supported="partial">
+	<software name="gaiflame" supported="yes">
 		<description>Gai Flame</description>
 		<year>1987</year>
 		<publisher>NCS</publisher>
 		<notes><![CDATA[
-No sound? (verify)
+No sound (btanb)
 ]]></notes>
 		<info name="alt_title" value="ガイフレーム" />
 		<info name="release" value="19871216" />
@@ -24258,58 +24380,59 @@ TODO: to install to HDD should be "INST1.BAT B: A:<folder>" but it fails recogni
 		</part>
 	</software>
 
-	<software name="hamlet" supported="no">
+	<software name="hamlet" supported="yes">
 		<description>Hamlet</description>
 		<year>1993</year>
 		<publisher>パンサーソフトウェア (Panther Software)</publisher>
 		<info name="alt_title" value="ハムレット" />
 		<info name="release" value="19931119" />
+		<info name="usage" value="Boot with Scenario disk only to skip Opening" />
 		<part name="flop1" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 1"/>
+			<feature name="part_id" value="Scenario"/>
 			<dataarea name="flop" size="1329680">
-				<rom name="hamlet_1.nfd" size="1329680" crc="27a871e8" sha1="2de5b50d32f08190fdc1d6e317658a79abafc389" offset="0" />
+				<rom name="hamlet_s.nfd" size="1329680" crc="4057cafc" sha1="6ba525f15828bfd81f040dedada3c101af6b283a" offset="0" />
 			</dataarea>
 		</part>
 		<part name="flop2" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="1329680">
-				<rom name="hamlet_2.nfd" size="1329680" crc="7f4428d9" sha1="32882d5683a43b1f8a842fdf58540cf189ae9f90" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop3" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 3"/>
-			<dataarea name="flop" size="1329680">
-				<rom name="hamlet_3.nfd" size="1329680" crc="0910b20b" sha1="e1b4b66400aad89edf847cb96cc4e2c1396586b6" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop4" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 4"/>
-			<dataarea name="flop" size="1329680">
-				<rom name="hamlet_4.nfd" size="1329680" crc="58f268b7" sha1="a6b3cb777f5c451c9a7b1967de5a12effcf77461" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop5" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 5"/>
-			<dataarea name="flop" size="1329680">
-				<rom name="hamlet_5.nfd" size="1329680" crc="a52b72c5" sha1="8737859a7b954d99bdd59fc9d1878c90bafd9b50" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop6" interface="floppy_5_25">
-			<feature name="part_id" value="Disk 6"/>
-			<dataarea name="flop" size="1329680">
-				<rom name="hamlet_6.nfd" size="1329680" crc="34fc4165" sha1="6fc535181e507a48f16de839b73cd14bd6879794" offset="0" />
-			</dataarea>
-		</part>
-		<part name="flop7" interface="floppy_5_25">
 			<feature name="part_id" value="Opening"/>
 			<dataarea name="flop" size="1329680">
 				<rom name="hamlet_o.nfd" size="1329680" crc="bdad7d9f" sha1="e91b571228499d27f486fb80694f7ac0efa3af64" offset="0" />
 			</dataarea>
 		</part>
-		<part name="flop8" interface="floppy_5_25">
-			<feature name="part_id" value="Scenario"/>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1329680">
-				<rom name="hamlet_s.nfd" size="1329680" crc="4057cafc" sha1="6ba525f15828bfd81f040dedada3c101af6b283a" offset="0" />
+				<rom name="hamlet_1.nfd" size="1329680" crc="27a871e8" sha1="2de5b50d32f08190fdc1d6e317658a79abafc389" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1329680">
+				<rom name="hamlet_2.nfd" size="1329680" crc="7f4428d9" sha1="32882d5683a43b1f8a842fdf58540cf189ae9f90" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1329680">
+				<rom name="hamlet_3.nfd" size="1329680" crc="0910b20b" sha1="e1b4b66400aad89edf847cb96cc4e2c1396586b6" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="1329680">
+				<rom name="hamlet_4.nfd" size="1329680" crc="58f268b7" sha1="a6b3cb777f5c451c9a7b1967de5a12effcf77461" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop7" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 5"/>
+			<dataarea name="flop" size="1329680">
+				<rom name="hamlet_5.nfd" size="1329680" crc="a52b72c5" sha1="8737859a7b954d99bdd59fc9d1878c90bafd9b50" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop8" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 6"/>
+			<dataarea name="flop" size="1329680">
+				<rom name="hamlet_6.nfd" size="1329680" crc="34fc4165" sha1="6fc535181e507a48f16de839b73cd14bd6879794" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -25514,7 +25637,7 @@ Optional [AMD-98] support, doesn't really use AY3
 		</part>
 	</software>
 
-	<software name="houkago" supported="no">
+	<software name="houkago" supported="yes">
 		<description>Houkago wa Betsu no Kao</description>
 		<year>1995</year>
 		<publisher>ユーコム (Ucom)</publisher>
@@ -26167,8 +26290,7 @@ Hangs on [MIDI] detection
 		</part>
 	</software>
 
-	<!-- randomly hangs with stuck note -->
-	<software name="tim" supported="partial">
+	<software name="tim" supported="yes">
 		<description>The Incredible Machine (v1.00)</description>
 		<year>1994</year>
 		<publisher>サイベル (Cybelle)</publisher>
@@ -26182,7 +26304,7 @@ Hangs on [MIDI] detection
 	</software>
 
 	<software name="inindo">
-		<description>Inindou - Datou Nobunaga</description>
+		<description>Inindou: Datou Nobunaga</description>
 		<year>1991</year>
 		<publisher>光栄 (Koei)</publisher>
 		<info name="alt_title" value="伊忍道 打倒信長" />
@@ -27820,6 +27942,9 @@ Hangs after Game Arts logo, expects buffer at $27a50 to be 0
 		<description>Kawaisou Monogatari</description>
 		<year>1988</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
+		<notes><![CDATA[
+Throws [FDC] DISK ERROR when clicking GAME START, CHRN=(0, 0, 3, 1024) and R=5 for Disk B
+]]></notes>
 		<info name="alt_title" value="かわいそう物語" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
@@ -27944,7 +28069,7 @@ Hangs after Game Arts logo, expects buffer at $27a50 to be 0
 	</software>
 
 	<software name="uranai" supported="no">
-		<description>Ketsuekigata-boshi Uranai (5.25&quot; Disk)</description>
+		<description>Ketsuekigata-boshi Uranai (5.25&quot; disk)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -27955,9 +28080,12 @@ Hangs after Game Arts logo, expects buffer at $27a50 to be 0
 	</software>
 
 	<software name="uranai35" cloneof="uranai" supported="no">
-		<description>Ketsuekigata-boshi Uranai (3.5&quot; Disks)</description>
+		<description>Ketsuekigata-boshi Uranai (3.5&quot; disks)</description>
 		<year>19??</year>
 		<publisher>Kogaku System</publisher>
+		<notes><![CDATA[
+"Unable to identify image file format"
+]]></notes>
 		<info name="alt_title" value="血液型星占い" />
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1?"/>
@@ -30157,10 +30285,13 @@ Heavy uses of palette raster effects (best results on pc9821)
 	</software>
 
 	<software name="leningrd" supported="no">
-		<!-- '87 release in 3.5"!? -->
+		<!-- Wrapper for P88SR emulator, most likely fake. -->
 		<description>Leningrad</description>
 		<year>1987</year>
 		<publisher>ポニーキャニオン (Pony Canyon)</publisher>
+		<notes><![CDATA[
+Hangs during PC-8801 bootstrap
+]]></notes>
 		<info name="alt_title" value="レニングラード" />
 		<info name="release" value="19870605" />
 		<part name="flop1" interface="floppy_3_5">
@@ -30249,11 +30380,13 @@ Wants two floppy disks if OPEN.EXE is executed
 		</part>
 	</software>
 
-	<!-- The intro music starts to play, but nothing shows up on screen and eventually the game hangs -->
 	<software name="chilambl" supported="no">
 		<description>Libros de Chilam Balam</description>
 		<year>1992</year>
 		<publisher>ライトスタッフ (Right Stuff)</publisher>
+		<notes><![CDATA[
+Hangs after intro
+]]></notes>
 		<info name="alt_title" value="ティラムバラム" />
 		<info name="release" value="19921107" />
 		<part name="flop1" interface="floppy_5_25">
@@ -30855,7 +30988,7 @@ Has optional [RS-MIDI] sound support
 	</software>
 
 	<software name="ldb_sima">
-		<description>LOGiN Disk &amp; Book Series - SimAnt (5.25&quot; Disks)</description>
+		<description>LOGiN Disk &amp; Book Series - SimAnt (5.25&quot; disks)</description>
 		<year>1993</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="ＬＯＧｉＮ ＤＩＳＫ＆ＢＯＯＫシリーズ - シムアント" />
@@ -30868,7 +31001,7 @@ Has optional [RS-MIDI] sound support
 	</software>
 
 	<software name="ldb_sima35" cloneof="ldb_sima" supported="no">
-		<description>LOGiN Disk &amp; Book Series - SimAnt (3.5&quot; Disks)</description>
+		<description>LOGiN Disk &amp; Book Series - SimAnt (3.5&quot; disks)</description>
 		<year>1993</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="ＬＯＧｉＮ ＤＩＳＫ＆ＢＯＯＫシリーズ - シムアント" />
@@ -30881,7 +31014,7 @@ Has optional [RS-MIDI] sound support
 	</software>
 
 	<software name="ldb_simaa" cloneof="ldb_sima">
-		<description>LOGiN Disk &amp; Book Series - SimAnt (5.25&quot; Disks, alt)</description>
+		<description>LOGiN Disk &amp; Book Series - SimAnt (5.25&quot; disks, alt)</description>
 		<year>1993</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="ＬＯＧｉＮ ＤＩＳＫ＆ＢＯＯＫシリーズ シムアント" />
@@ -32201,7 +32334,6 @@ Cannot detect sound card on VM class (verify)
 		<year>1987</year>
 		<publisher>シンキングラビット (Thinking Rabbit)</publisher>
 		<info name="alt_title" value="ザ マン アイ ラブ" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="820592">
 				<rom name="the_man.d88" size="820592" crc="75417feb" sha1="1939995bc0fbef0ab8de7caea360fdfa1ec345e4" offset="0" />
@@ -32553,7 +32685,7 @@ Optional [AMD-98] support, needs PIT for BGM
 		<description>Mario Bros. Special</description>
 		<year>1985</year>
 		<publisher>ハドソン (Hudson Soft)</publisher>
-		<info name="alt_title" value="マリオブラザーズスペシャル" />
+		<info name="alt_title" value="マリオブラザーズ スペシャル" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1086448">
 				<rom name="mariosp.d88" size="1086448" crc="2992943f" sha1="735f2bd8127c08ced963071d071634b7df61e13e" offset="0" />
@@ -33397,6 +33529,38 @@ Puts a TSR [mouse] driver during DOS boot, doesn't work in game? (verify)
 		</part>
 	</software>
 
+	<!-- 3.5" release known to exist -->
+	<software name="metlfrce" supported="partial">
+		<description>Metal Force</description>
+		<year>1993</year>
+		<publisher>遊演体 (You-en-tai)</publisher>
+		<notes><![CDATA[
+[PC-9801-86] DAC doesn't work
+]]></notes>
+		<info name="alt_title" value="メタルフォース" />
+		<info name="release" value="1993xxxx" />
+		<info name="usage" value="Supports Speakboard sound card (ADPCM), boot with data disk in drive B: to skip Opening" />
+		<part name="flop1" interface="floppy_5_25">
+			<feature name="part_id" value="System Disk"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="metal force (system disk).hdm" size="1261568" crc="f36c66b7" sha1="96155fff45b67b10ad983f7654d00353572cf9d5" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Opening Disk"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="metal force (opening disk).hdm" size="1261568" crc="90ac1ef1" sha1="d54c94aa8a01f1ac3a6b068f697ed46115d48904" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Data Disk"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="Metal Force (Data disk).hdm" size="1261568" crc="6c133aaa" sha1="ce3d8cf0aad2b1fd2efdec6bd949b5034790f1f6" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+
 	<software name="metalor" supported="yes">
 		<description>Cyber Block Metal Orange</description>
 		<year>1991</year>
@@ -33980,7 +34144,6 @@ Verify blinking on ranking screen
 		<year>1992</year>
 		<publisher>カクテル・ソフト (Cocktail Soft)</publisher>
 		<info name="alt_title" value="美姫" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="miki.fdi" size="1265664" crc="2eb3c709" sha1="6d6101e31e89f68c1a1ef491e6eb7644bb361e45" offset="0" />
@@ -35770,6 +35933,7 @@ Requires MS-DOS 5.00H plus an unknown procedure (HDD install?)
 		<description>New 3D Golf Simulation Ver. 2.0</description>
 		<year>1992</year>
 		<publisher>ティーアンドイーソフト (T&amp;E Soft)</publisher>
+		<info name="usage" value="Requires GDC 2.5 MHz" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="System Disk 1"/>
 			<dataarea name="flop" size="1261568">
@@ -38442,7 +38606,6 @@ Requires [kanji] board, currently missing from vanilla class (use VM)
 		<year>1990</year>
 		<publisher>イマジニア (Imagineer)</publisher>
 		<info name="alt_title" value="ポピュラス２ エキスパート ~ Populous II Expert" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1281968">
@@ -43014,6 +43177,7 @@ Cannot install, gets stuck at "please insert disk and press mouse" prompt, tests
 		<year>1986</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<info name="alt_title" value="ザ・スクリーマー" />
+		<info name="developer" value="MagicalZoo" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="the screamer (1985)(magical zoo).fdi" size="1265664" crc="86f2163d" sha1="2d73222c8e7372f32b529798d0da60b36c875053" offset="0" />
@@ -43728,11 +43892,16 @@ Cannot install, gets stuck at "please insert disk and press mouse" prompt, tests
 		</part>
 	</software>
 
-	<software name="sbest9py">
+	<software name="sbest9py" supported="no">
 		<description>Shin Best Nine Pro Yakyuu</description>
 		<year>1986</year>
 		<publisher>アスキー (ASCII)</publisher>
+		<notes><![CDATA[
+Crashes when selecting game, executes code in [GVRAM]
+Never completes a make data disk, does it need an undumped data disk?
+]]></notes>
 		<info name="alt_title" value="新ベストナインプロ野球" />
+		<info name="usage" value="Needs 2DD set in options" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="697008">
 				<rom name="new_best_nine_baseball.d88" size="697008" crc="99ff784b" sha1="be37e0e68ed180aeb564e49c50ee7ef2d6b579d2" offset="0" />
@@ -44216,7 +44385,7 @@ Cannot install, gets stuck at "please insert disk and press mouse" prompt, tests
 		</part>
 	</software>
 
-	<software name="silentsr">
+	<software name="silentsr" supported="yes">
 		<description>The Silent Service - Chinmoku no Kantai</description>
 		<year>1991</year>
 		<publisher>ジーエーエム (GAM)</publisher>
@@ -44649,6 +44818,20 @@ hand repaired copy protection, looks for deleted sector -8 and -9 on track 76
 		</part>
 	</software>
 
+	<software name="soapstry">
+		<description>Soapland Story</description>
+		<year>1987</year>
+		<publisher>ハード (Hard)</publisher>
+		<info name="alt_title" value="ソープランドストーリー" />
+		<info name="release" value="198709xx" />
+		<info name="usage" value="Boot in BASIC and set MEMSW SSW3 to 05 thru MON (will otherwise throw an overflow error at bootstrap)" />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="1187040">
+				<rom name="soapland story.d88" size="1187040" crc="9dbb2392" sha1="21cd5846770f62c37a4b5118fad7bb2ad25d1f3a" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="softhard">
 		<description>Soft de Hard na Monogatari</description>
 		<year>1988</year>
@@ -44831,7 +45014,6 @@ Enables [FDC] XTMASK irq
 		<year>1988</year>
 		<publisher>日本ファルコム (Nihon Falcom)</publisher>
 		<info name="alt_title" value="ソーサリアン 追加シナリオ Ｖｏｌ．１" />
-		<info name="release" value="" />
 		<info name="usage" value="Requires &quot;Sorcerian&quot; to work" />
 		<info name="datadisk" value="sorcer" />
 		<part name="flop1" interface="floppy_5_25">
@@ -45502,7 +45684,7 @@ Not extensively tested
 		</part>
 	</software>
 
-	<software name="stellasn" supported="no">
+	<software name="stellasn" supported="yes">
 		<description>The Stellar Sign - Toki no Shirube</description>
 		<year>1995</year>
 		<publisher>アスキー (ASCII)</publisher>
@@ -47803,7 +47985,6 @@ Requires a VM class machine, runs too fast on RS and beyond
 		<year>198?</year>
 		<publisher>パンサーソフトウェア (Panther Software)</publisher>
 		<info name="alt_title" value="天九牌スペシャル 桃源の宴" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
 				<rom name="tien gow pai special - tougen no utage.fdi" size="1265664" crc="64c28d58" sha1="c5385d4d9e2c489f8945b6abc631eb2989964459" offset="0" />
@@ -48285,11 +48466,11 @@ Eventually hangs with stuck [PC9801-26] sound note (verify, should be fixed)
 	</software>
 
 	<software name="tesserae">
-		<description>Tesserae</description>
+		<description>Tessera Kimi wa Yogoreta Tenshi ka Seinaru Majo ka!?</description>
 		<year>1992</year>
-		<publisher>アスキー (ASCII)</publisher>
-		<info name="alt_title" value="テッセラ" />
-		<info name="release" value="19920327" />
+		<publisher>ＧＡＭＥテクノポリス (Game Technopolis)</publisher>
+		<info name="alt_title" value="テセラ キミは汚れた天使か聖なる魔女か!?" />
+		<!-- <info name="release" value="1992xxxx" /> -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1281968">
@@ -48427,10 +48608,14 @@ Eventually hangs with stuck [PC9801-26] sound note (verify, should be fixed)
 		</part>
 	</software>
 
-	<software name="tforce">
+	<software name="tforce" supported="no">
 		<description>Thunder Force</description>
 		<year>1984</year>
 		<publisher>テクノソフト (Techno Soft)</publisher>
+		<notes><![CDATA[
+"Incorrect layout on track 0 head 1, expected_size=100000, current_size=124448"
+May require [PC80S31] interface?
+]]></notes>
 		<info name="alt_title" value="サンダーフォース" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="351024">
@@ -51153,17 +51338,6 @@ doesn't boot when converted to d88 (2DD)
 		</part>
 	</software>
 
-	<software name="versalnk" supported="no">
-		<description>Versa-Link</description>
-		<year>1986</year>
-		<publisher>Cosmo Sys. Lab.</publisher>
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261568">
-				<rom name="versa_link.hdm" size="1261568" crc="6d05987c" sha1="e3dd6b3d1c36bf4a82ad05d747917a3556d06bd8" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="vipev16d">
 		<description>Viper V16 Demo</description>
 		<year>1995?</year>
@@ -51436,10 +51610,13 @@ doesn't boot when converted to d88 (2DD)
 		</part>
 	</software>
 
-	<software name="weaponsf">
+	<software name="weaponsf" supported="partial">
 		<description>Weapons Free</description>
-		<year>19??</year>
+		<year>1995</year>
 		<publisher>総合ビジネスアシスト (ABA)</publisher>
+		<notes><![CDATA[
+[gaiji] LR errors around 'Z' and 'X' chars at least (verify)
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
 				<rom name="weapons free (aba).fdi" size="1478656" crc="5be6a6bc" sha1="0268b0b366026804b0c8f94434f6bf81b2a19d7f" offset="0" />
@@ -52032,6 +52209,39 @@ doesn't boot when converted to d88 (2DD)
 		</part>
 	</software>
 
+	<software name="wolf3d" supported="partial">
+		<description>Wolfenstein 3D</description>
+		<year>1994</year>
+		<publisher>イマジニア (Imagineer)</publisher>
+		<notes><![CDATA[
+[SB16] detection doesn't work due of [OPL3]
+https://github.com/aaronsgiles/ymfm/issues/73
+Has no BGM on main menu (verify)
+]]></notes>
+		<info name="alt_title" value="ウルフェンシュタイン3D" />
+		<info name="usage" value="Requires HDD install thru DOS, optionally wants a MS-DOS format disk (safe to skip when prompted to)" />
+
+		<part name="flop1" interface="floppy_5_25">
+			<!-- TODO: Check media labels, is "kidou" actually written with kanji? -->
+			<feature name="part_id" value="Startup disk"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="wolfenstein 3d (kidou disk).hdm" size="1261568" crc="472f5a26" sha1="50b45b06fa005fede60510cb68bebe932bdc080b" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="wolfenstein 3d (disk 1).hdm" size="1261568" crc="995ac998" sha1="45e0a692cbc553d4cf4a8fd55399d8c3a2993072" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="wolfenstein 3d (disk 2).hdm" size="1261568" crc="bf79a9dd" sha1="29e4b8c2ef802566b0dcfce56bd7a0ec2fc2a6b2" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="wolfishg">
 		<description>Wolfish Gallop - Legacy of the Solomon</description>
 		<year>1994</year>
@@ -52290,7 +52500,6 @@ doesn't boot when converted to d88 (2DD)
 		<year>1992?</year>
 		<publisher>グレイト (Great)</publisher>
 		<info name="alt_title" value="レッスルエンジェルス おまけDISK" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1265664">
@@ -52304,7 +52513,6 @@ doesn't boot when converted to d88 (2DD)
 		<year>1992?</year>
 		<publisher>グレイト (Great)</publisher>
 		<info name="alt_title" value="レッスルエンジェルス おまけDISK" />
-		<info name="release" value="" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1281968">
@@ -53746,11 +53954,12 @@ Is this a data disk for missing main game dump?
 	</software>
 
 	<software name="yuutoden">
-		<description>Yuutoden</description>
+		<description>Youtoden</description>
 		<year>1989</year>
 		<publisher>システムソフト (SystemSoft)</publisher>
 		<info name="alt_title" value="遊兎伝" />
 		<info name="release" value="198906xx" />
+		<!-- TODO: Krugman claims Program Disk and Data Disk labels -->
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="1281968">
@@ -54604,7 +54813,7 @@ Doesn't boot on vanilla class (verify), notes use VM class
 <!-- !Doujinshi Game and Software Packs / Collections -->
 
 	<software name="doujins1">
-		<description>Doujin Soft Shuusaku Game Collection Vol. 1 (5.25&quot; Disks)</description>
+		<description>Doujin Soft Shuusaku Game Collection Vol. 1 (5.25&quot; disks)</description>
 		<year>19??</year>
 		<publisher>Shuwa System Trading</publisher>
 		<info name="alt_title" value="同人ソフト秀作ゲームコレクションＶｏｌ１" />
@@ -54642,7 +54851,7 @@ Doesn't boot on vanilla class (verify), notes use VM class
 	</software>
 
 	<software name="doujins135" cloneof="doujins1" supported="no">
-		<description>Doujin Soft Shuusaku Game Collection Vol. 1 (3.5&quot; Disks)</description>
+		<description>Doujin Soft Shuusaku Game Collection Vol. 1 (3.5&quot; disks)</description>
 		<year>19??</year>
 		<publisher>Shuwa System Trading</publisher>
 		<info name="alt_title" value="同人ソフト秀作ゲームコレクションＶｏｌ１" />
@@ -54740,7 +54949,7 @@ Doesn't boot on vanilla class (verify), notes use VM class
 	</software>
 
 	<software name="gc30" supported="no">
-		<description>Game Collection 30 (5.25&quot; Disk)</description>
+		<description>Game Collection 30 (5.25&quot; disk)</description>
 		<year>19??</year>
 		<publisher>Shuwa System Trading</publisher>
 		<info name="alt_title" value="ゲームコレクション 30" />
@@ -54752,9 +54961,12 @@ Doesn't boot on vanilla class (verify), notes use VM class
 	</software>
 
 	<software name="gc3035" cloneof="gc30" supported="no">
-		<description>Game Collection 30 (3.5&quot; Disk)</description>
+		<description>Game Collection 30 (3.5&quot; disk)</description>
 		<year>19??</year>
 		<publisher>Shuwa System Trading</publisher>
+		<notes><![CDATA[
+"Unable to identify image file format"
+]]></notes>
 		<info name="alt_title" value="ゲームコレクション 30" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1261568">
@@ -54833,7 +55045,7 @@ Doesn't boot on vanilla class (verify), notes use VM class
 	</software>
 
 	<software name="100best" supported="no">
-		<description>100 Best Freeware Programs Set 1 (5.25&quot; Disks)</description>
+		<description>100 Best Freeware Programs Set 1 (5.25&quot; disks)</description>
 		<year>1992</year>
 		<publisher>&lt;unknown&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -54893,9 +55105,12 @@ Doesn't boot on vanilla class (verify), notes use VM class
 	</software>
 
 	<software name="100best35" cloneof="100best" supported="no">
-		<description>100 Best Freeware Programs Set 1 (3.5&quot; Disks)</description>
+		<description>100 Best Freeware Programs Set 1 (3.5&quot; disks)</description>
 		<year>19??</year>
 		<publisher>&lt;unknown&gt;</publisher>
+		<notes><![CDATA[
+"Unable to identify image file format" for all entries
+]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<feature name="part_id" value="Disk 1"/>
 			<dataarea name="flop" size="1310720">
@@ -58018,7 +58233,7 @@ Hangs if [PC9801-86] is mounted, no BGM is played
 		</part>
 	</software>
 
-	<software name="gaogao1" supported="no">
+	<software name="gaogao1" supported="yes">
 		<description>Gao Gao! 1st - Radical Sequence</description>
 		<year>1994</year>
 		<publisher>フォア・ナイン (Fournine)</publisher>
@@ -58543,12 +58758,13 @@ Hangs if [PC9801-86] is mounted, no BGM is played
 		</part>
 	</software>
 
-	<software name="grounsed" supported="no">
+	<software name="grounsed" supported="yes">
 		<description>Grounseed</description>
 		<year>1996</year>
 		<publisher>スタジオ・トゥインクル (Studio Twinkle)</publisher>
 		<info name="alt_title" value="グランシード" />
 		<info name="release" value="19960607" />
+		<info name="developer" value="Exit" />
 		<part name="flop1" interface="floppy_5_25">
 			<feature name="part_id" value="Disk A"/>
 			<dataarea name="flop" size="311292">
@@ -59813,7 +60029,8 @@ Hangs if [PC9801-86] is mounted, no BGM is played
 		</part>
 	</software>
 
-	<software name="kurayami" supported="no">
+	<!-- Disk 2 copy protection repaired by hand -->
+	<software name="kurayami" supported="yes">
 		<description>Kurayami</description>
 		<year>1996</year>
 		<publisher>メロディ (Melody)</publisher>
@@ -59827,8 +60044,9 @@ Hangs if [PC9801-86] is mounted, no BGM is played
 		</part>
 		<part name="flop2" interface="floppy_5_25">
 			<feature name="part_id" value="Disk 2"/>
-			<dataarea name="flop" size="952316">
-				<rom name="kurayami (1996)(melody)(disk 2 of 5)[req install].fdd" size="952316" crc="38cdfb19" sha1="bcc9537c2d24bb62acbe44c8683bfdb03561d945" offset="0" />
+			<dataarea name="flop" size="1283008">
+				<!-- baddump: as note above -->
+				<rom name="kurayami (1996)(melody)(disk 2 of 5)[req install].d88" size="1283008" crc="18febc6a" sha1="9294a37c1474a2210b1f01aef8c1bd18320c8d17" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 		<part name="flop3" interface="floppy_5_25">
@@ -64461,7 +64679,7 @@ Cutoff [kanji] LR right side (verify, should be fixed)
 
 	<!-- TODO: is cgtsuku a non-coverdisc version of these? -->
 	<software name="ldb_cg3d" supported="no">
-		<description>LOGiN Disk &amp; Book Series - CG Tsukuuru 3D (5.25&quot; Disks)</description>
+		<description>LOGiN Disk &amp; Book Series - CG Tsukuuru 3D (5.25&quot; disks)</description>
 		<year>1992</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -64479,7 +64697,7 @@ Cutoff [kanji] LR right side (verify, should be fixed)
 	</software>
 
 	<software name="ldb_cg3d35" cloneof="ldb_cg3d" supported="no">
-		<description>LOGiN Disk &amp; Book Series - CG Tsukuuru 3D (3.5&quot; Disks)</description>
+		<description>LOGiN Disk &amp; Book Series - CG Tsukuuru 3D (3.5&quot; disks)</description>
 		<year>1992</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -64563,7 +64781,7 @@ Cutoff [kanji] LR right side (verify, should be fixed)
 	</software>
 
 	<software name="ldb_rivh" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Riverhill Mystery Selection (5.25&quot; Disks)</description>
+		<description>LOGiN Disk &amp; Book Series - Riverhill Mystery Selection (5.25&quot; disks)</description>
 		<year>1993</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -64581,7 +64799,7 @@ Cutoff [kanji] LR right side (verify, should be fixed)
 	</software>
 
 	<software name="ldb_rivh35" cloneof="ldb_rivh" supported="no">
-		<description>LOGiN Disk &amp; Book Series - Riverhill Mystery Selection (3.5&quot; Disks)</description>
+		<description>LOGiN Disk &amp; Book Series - Riverhill Mystery Selection (3.5&quot; disks)</description>
 		<year>1993</year>
 		<publisher>アスキー (ASCII)</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -65766,10 +65984,10 @@ Cutoff [kanji] LR right side (verify, should be fixed)
 
 	<software name="bkturb" supported="no">
 		<description>BK Turb</description>
-		<year>199?</year>
+		<year>1995</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<notes><![CDATA[
-Requires 3.5" floppy emulation
+Timer looks too slow (verify)
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
@@ -65847,11 +66065,13 @@ Requires 3.5" floppy emulation
 	</software>
 
 	<software name="f1grandp" supported="no">
+		<!-- Demo? -->
 		<description>F1 Grandprix</description>
-		<year>1992</year>
+		<!-- 1992 / 1995 on title screen -->
+		<year>1995</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<notes><![CDATA[
-Requires 3.5" floppy emulation
+No sound (verify)
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
@@ -65895,7 +66115,7 @@ Uses [DAC1BIT] only for sound
 		<year>1990</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<notes><![CDATA[
-Requires 3.5" floppy emulation
+TODO: understand how to play this
 ]]></notes>
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
@@ -65906,7 +66126,7 @@ Requires 3.5" floppy emulation
 
 	<software name="goggle2" supported="yes">
 		<!-- "The Ptolemaic Game" -->
-		<description>Goggle-II (5.25&quot; Disk)</description>
+		<description>Goggle-II (5.25&quot; disk)</description>
 		<year>1992</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -65917,7 +66137,7 @@ Requires 3.5" floppy emulation
 	</software>
 
 	<software name="goggle2a" cloneof="goggle2" supported="yes">
-		<description>Goggle-II (3.5&quot; Disk)</description>
+		<description>Goggle-II (3.5&quot; disk)</description>
 		<year>1992</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -65927,7 +66147,8 @@ Requires 3.5" floppy emulation
 		</part>
 	</software>
 
-	<software name="goggle3">
+	<software name="goggle3" supported="yes">
+		<!-- "The Ptolemaic Game Goggle-III: Super Spartan", version 1.0 -->
 		<description>Goggle-III</description>
 		<year>1995</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
@@ -65938,7 +66159,7 @@ Requires 3.5" floppy emulation
 		</part>
 	</software>
 
-	<software name="goggle3a" cloneof="goggle3">
+	<software name="goggle3a" cloneof="goggle3" supported="yes">
 		<description>Goggle-III (alt)</description>
 		<year>1995</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
@@ -66024,7 +66245,7 @@ Fails detecting [PC9801-26], wants bit 6 high by reading $27
 		</part>
 	</software>
 
-	<software name="seena2">
+	<software name="seena2" supported="yes">
 		<description>SeeNa 2</description>
 		<year>1995</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
@@ -66046,7 +66267,7 @@ Fails detecting [PC9801-26], wants bit 6 high by reading $27
 		</part>
 	</software>
 
-	<software name="stardust">
+	<software name="stardust" supported="yes">
 		<description>Stardust Chaser</description>
 		<year>1992</year>
 		<publisher>バイオひゃくパーセント (Bio 100%)</publisher>
@@ -66713,8 +66934,8 @@ Crashes with a BASIC error when accessing house near starting point, incomplete 
 		</part>
 	</software>
 
-	<software name="volley2" supported="no">
-		<description>Volleyball 2 on 2 (3.5&quot; Disk)</description>
+	<software name="volley2" supported="yes">
+		<description>Volleyball 2 on 2 (3.5&quot; disk)</description>
 		<year>1994</year>
 		<publisher>&lt;unofficial&gt;</publisher>
 		<part name="flop1" interface="floppy_3_5">
@@ -66725,7 +66946,7 @@ Crashes with a BASIC error when accessing house near starting point, incomplete 
 	</software>
 
 	<software name="volley2a" cloneof="volley2" supported="yes">
-		<description>Volleyball 2 on 2 (5.25&quot; Disk)</description>
+		<description>Volleyball 2 on 2 (5.25&quot; disk)</description>
 		<year>19??</year>
 		<publisher>&lt;unofficial&gt;</publisher>
 		<part name="flop1" interface="floppy_5_25">
@@ -66748,19 +66969,6 @@ Crashes with a BASIC error when accessing house near starting point, incomplete 
 
 <!-- !Doujinshi -->
 
-	<!-- X68000 / PC-9801 hybrid -->
-	<software name="0x0f">
-		<description>0x0F exp.3</description>
-		<year>19??</year>
-		<publisher>&lt;doujin&gt;</publisher>
-		<info name="usage" value="Run PC98.BAT from DOS" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261568">
-				<rom name="0x0f_exp3.hdm" size="1261568" crc="5e51b3e3" sha1="df99f88c8202d39d3ab8f0ffa8205f89c91e8885" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
 	<software name="5galscon" supported="no">
 		<description>Five Gals Connection</description>
 		<year>19??</year>
@@ -66778,10 +66986,13 @@ Has XA and LT support according to spine card
 		</part>
 	</software>
 
-	<software name="5x5go" supported="no">
+	<software name="5x5go" supported="partial">
 		<description>5x5 [Go! Go!]</description>
 		<year>1995?</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+Throws non-fatal HIMEM.SYS HMA error during boot (investigate)
+]]></notes>
 		<info name="author" value="Udukisya" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
@@ -66814,9 +67025,9 @@ Has XA and LT support according to spine card
 		</part>
 	</software>
 
-	<software name="musume" supported="no">
+	<software name="musume" supported="yes">
 		<description>Adesugata Sannin Musume</description>
-		<year>19??</year>
+		<year>1995</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="author" value="美園ソフト ~ Misono Soft" />
 		<info name="alt_title" value="艶姿三人娘" />
@@ -66863,22 +67074,9 @@ Has XA and LT support according to spine card
 		</part>
 	</software>
 
-	<!-- Hybrid disk. Supports PC-9801, PC-88VA, FM Towns and X68000. -->
-	<software name="akazucc">
-		<description>Akazukin Cha Cha - CG Works ver 1.00</description>
-		<year>1994</year>
-		<publisher>&lt;doujin&gt;</publisher>
-		<info name="usage" value="Run PC98.BAT from DOS" />
-		<part name="flop1" interface="floppy_5_25">
-			<dataarea name="flop" size="1261568">
-				<rom name="little_red_riding_hood_chacha_-_cg_works_ver1.hdm" size="1261568" crc="6062e4cf" sha1="910c826b387519601db369b8064e4eb488cdd00c" offset="0" />
-			</dataarea>
-		</part>
-	</software>
-
-	<software name="akihime" supported="no">
+	<software name="akihime" supported="yes">
 		<description>Akihime - Goddess in the Caeseress</description>
-		<year>19??</year>
+		<year>1996?</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="author" value="Manimi-Joestar + Team KuSoGe" />
 		<part name="flop1" interface="floppy_3_5">
@@ -66888,14 +67086,18 @@ Has XA and LT support according to spine card
 		</part>
 	</software>
 
-	<software name="amidacho" supported="no">
-		<description>Amida ChonChon</description>
+	<software name="amidacho" supported="partial">
+		<description>Amida ChonChon (v1.4)</description>
 		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+Borked autoexec.bat, tries to load Anex86 MSCDEX.EXE even if it has no business with CD (CTRL+C then execute A:amida\amida.exe)
+Uses [DAC1BIT]
+]]></notes>
 		<info name="author" value="Electric Sea Urchin" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1430524">
-				<rom name="amida chonchon (1994)(electric sea urchin)(jp).fdd" size="1430524" crc="a3b360c3" sha1="6ce81f438097f68f62e3702d8bb043ff5f74c4b5" offset="0" />
+				<rom name="amida chonchon (1994)(electric sea urchin)(jp).fdd" size="1430524" crc="a3b360c3" sha1="6ce81f438097f68f62e3702d8bb043ff5f74c4b5" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -66913,8 +67115,12 @@ Has XA and LT support according to spine card
 
 	<software name="armormai" supported="no">
 		<description>Armored Girl Nirvana Mai</description>
-		<year>19??</year>
+		<year>1991?</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+pc9821: Hangs with blue screen after title
+pc9821ap2: runs too fast in gameplay
+]]></notes>
 		<info name="author" value="Manimi-Joestar + Team KuSoGe" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
@@ -67015,9 +67221,9 @@ Has XA and LT support according to spine card
 		</part>
 	</software>
 
-	<software name="akemi" supported="no">
+	<software name="akemi" supported="yes">
 		<description>Bounty Hunter Akemi</description>
-		<year>19??</year>
+		<year>1996?</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="author" value="SOFT HOUSE 印度人 (Soft House Indojin)" />
 		<info name="alt_title" value="バウンティーハンター アケミ" />
@@ -67051,9 +67257,9 @@ Has XA and LT support according to spine card
 		</part>
 	</software>
 
-	<software name="btbsoft" supported="no">
+	<software name="btbsoft" supported="yes">
 		<description>CG Gallery 1 (B.T.B Software)</description>
-		<year>19??</year>
+		<year>1993</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="author" value="B.T.B Software" />
 		<part name="flop1" interface="floppy_3_5">
@@ -67067,6 +67273,10 @@ Has XA and LT support according to spine card
 		<description>C.G. Gallery 7 - Escort</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+Throws non-fatal HIMEM.SYS HMA error during boot (investigate)
+Throws non-fatal LOAD98 "KAMISHIBAI ENGINE ERROR REPORT" at line 32
+]]></notes>
 		<info name="author" value="Studio Z&amp;3N" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
@@ -67128,9 +67338,9 @@ Has XA and LT support according to spine card
 		</part>
 	</software>
 
-	<software name="chinghai" supported="no">
+	<software name="chinghai" supported="yes">
 		<description>ChingHai</description>
-		<year>19??</year>
+		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="author" value="Zepher" />
 		<part name="flop1" interface="floppy_3_5">
@@ -67287,10 +67497,13 @@ Has XA and LT support according to spine card
 		</part>
 	</software>
 
-	<software name="destruct">
-		<description>Destructor (5.25&quot; Disk)</description>
-		<year>19??</year>
+	<software name="destruct" supported="no">
+		<description>Destructor (5.25&quot; disk)</description>
+		<year>1993?</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+Uses raster effects which tanks performance during gameplay
+]]></notes>
 		<info name="author" value="HoeHoe Club" />
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1265664">
@@ -67300,9 +67513,12 @@ Has XA and LT support according to spine card
 	</software>
 
 	<software name="destructa" cloneof="destruct" supported="no">
-		<description>Destructor (3.5&quot; Disk)</description>
-		<year>19??</year>
+		<description>Destructor (3.5&quot; disk)</description>
+		<year>1993?</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+Uses raster effects which tanks performance during gameplay
+]]></notes>
 		<info name="author" value="HoeHoe Club" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
@@ -67407,9 +67623,9 @@ Has XA and LT support according to spine card
 		</part>
 	</software>
 
-	<software name="esp" supported="no">
+	<software name="esp" supported="yes">
 		<description>E.S.P</description>
-		<year>1994</year>
+		<year>1999?</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="author" value="A-Inn" />
 		<part name="flop1" interface="floppy_3_5">
@@ -67465,20 +67681,19 @@ Has XA and LT support according to spine card
 		</part>
 	</software>
 
-	<!-- Disk I/O error -->
-	<software name="fnereid" supported="no">
+	<software name="fnereid" supported="yes">
 		<description>Fervent Nereid - She's So Unusual</description>
 		<year>1995</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="alt_title" value="NYS &amp; Rapcat" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1265664">
 				<rom name="fervent nereid.fdi" size="1265664" crc="531d9ca8" sha1="0dcb35f19399e34fe3e0888f37fdcc23ba57d6a5" offset="0" />
 			</dataarea>
 		</part>
 	</software>
 
-	<software name="firstfa5" supported="no">
+	<software name="firstfa5" supported="yes">
 		<description>First Fantazy 5</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -67738,6 +67953,9 @@ Has XA and LT support according to spine card
 		<description>Kitty World 2</description>
 		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+No keypress works for selecting main menu entries
+]]></notes>
 		<info name="author" value="Griffon" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
@@ -67867,12 +68085,12 @@ Has XA and LT support according to spine card
 		</part>
 	</software>
 
-	<software name="lex" supported="no">
+	<software name="lex" supported="yes">
 		<description>LEX</description>
 		<year>1993</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="author" value="Studio Sold Out" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1497084">
 				<rom name="lex (1993)(studio sold out)(jp).fdd" size="1497084" crc="8f19d42d" sha1="69b7a35c6d2a4b6b02053093e1676d47fbcede08" offset="0" />
 			</dataarea>
@@ -68009,8 +68227,12 @@ Has XA and LT support according to spine card
 
 	<software name="mana94" supported="no">
 		<description>Mana '94</description>
-		<year>19??</year>
+		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+Doesn't boot stand-alone, requires separate MS-DOS env, mangled boot sector?
+Draws with half height in GDC 5 MHz mode
+]]></notes>
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="mana_94.hdm" size="1261568" crc="53f53191" sha1="439bcda077addd6d94cd64b0559364112c791d32" offset="0" />
@@ -68047,10 +68269,10 @@ Has XA and LT support according to spine card
 
 	<software name="masthand" supported="no">
 		<description>Master Hand</description>
-		<year>19??</year>
+		<year>1992?</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="alt_title" value="H. Kitajima?" />
-		<part name="flop1" interface="floppy_5_25">
+		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1425404">
 				<rom name="master hand (19xx)(kitajima, h.)(jp).fdd" size="1425404" crc="47348b39" sha1="5f96407f4beb62d08f85e2fc8fc7ff926bcb8809" offset="0" />
 			</dataarea>
@@ -68198,6 +68420,9 @@ Has XA and LT support according to spine card
 		<description>Mobile Delivery</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+pc9821: Runs too fast
+]]></notes>
 		<info name="author" value="Kuni-Soft" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
@@ -68210,10 +68435,13 @@ Has XA and LT support according to spine card
 		<description>MoguPoko</description>
 		<year>19??</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+Throws Abort Retry Fail during boot or if dir is issued
+]]></notes>
 		<info name="author" value="Namikaze" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
-				<rom name="mogupoko (namikaze).fdi" size="1478656" crc="c86c48aa" sha1="0a818cddd0604d52fb1bf54b7fb154ea04c5aea1" offset="0" />
+				<rom name="mogupoko (namikaze).fdi" size="1478656" crc="c86c48aa" sha1="0a818cddd0604d52fb1bf54b7fb154ea04c5aea1" offset="0" status="baddump" />
 			</dataarea>
 		</part>
 	</software>
@@ -68278,7 +68506,7 @@ Has XA and LT support according to spine card
 
 	<software name="nadiamw" supported="no">
 		<description>Nadia of the Sea - Mysteries of Blue Water</description>
-		<year>19??</year>
+		<year>1991?</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="author" value="Geinax" />
 		<part name="flop1" interface="floppy_3_5">
@@ -68290,7 +68518,7 @@ Has XA and LT support according to spine card
 
 	<software name="napcity" supported="no">
 		<description>Napple City</description>
-		<year>19??</year>
+		<year>1991</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="author" value="Daimanji - Gakusyu-Jyuku" />
 		<part name="flop1" interface="floppy_3_5">
@@ -68443,9 +68671,9 @@ Has XA and LT support according to spine card
 		</part>
 	</software>
 
-	<software name="ossaultp" supported="no">
+	<software name="ossaultp" supported="yes">
 		<description>Ossault Plus</description>
-		<year>19??</year>
+		<year>1993?</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="author" value="EXE" />
 		<part name="flop1" interface="floppy_3_5">
@@ -68588,6 +68816,10 @@ Has XA and LT support according to spine card
 		<description>Princess Confusion</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+[keyboard] inputs forgets directional key repetition
+Punts with "ERR" when selecting SYSTEM option (needs install?)
+]]></notes>
 		<info name="author" value="Initialize" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
@@ -68608,7 +68840,7 @@ Has XA and LT support according to spine card
 		</part>
 	</software>
 
-	<software name="raycards" supported="no">
+	<software name="raycards" supported="yes">
 		<description>Ray Cards</description>
 		<year>1995</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -68641,8 +68873,12 @@ Has XA and LT support according to spine card
 
 	<software name="revaw2" supported="no">
 		<description>Revival - Astro Wars Part II</description>
-		<year>19??</year>
+		<year>1994?</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+pc9821: Hangs on title
+pc9821ap2: runs too fast in gameplay
+]]></notes>
 		<info name="author" value="Taka." />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
@@ -68802,9 +69038,9 @@ Doesn't autoboot on anything that isn't x68k, sports lowercased autoexec.bat, is
 		</part>
 	</software>
 
-	<software name="sentgfx1" supported="no">
+	<software name="sentgfx1" supported="yes">
 		<description>Sentimental Graphics Vol. 1</description>
-		<year>19??</year>
+		<year>1997</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="author" value="Team Zero" />
 		<part name="flop1" interface="floppy_3_5">
@@ -68851,9 +69087,9 @@ Doesn't autoboot on anything that isn't x68k, sports lowercased autoexec.bat, is
 		</part>
 	</software>
 
-	<software name="sinoraq2" supported="no">
+	<software name="sinoraq2" supported="yes">
 		<description>Sinora's Quest 2</description>
-		<year>19??</year>
+		<year>1999?</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="author" value="Roronworld" />
 		<part name="flop1" interface="floppy_3_5">
@@ -68863,9 +69099,9 @@ Doesn't autoboot on anything that isn't x68k, sports lowercased autoexec.bat, is
 		</part>
 	</software>
 
-	<software name="sinoraq2a" cloneof="sinoraq2" supported="no">
+	<software name="sinoraq2a" cloneof="sinoraq2" supported="yes">
 		<description>Sinora's Quest 2 (alt)</description>
-		<year>19??</year>
+		<year>1999?</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="author" value="Roronworld" />
 		<part name="flop1" interface="floppy_3_5">
@@ -68890,6 +69126,9 @@ Doesn't autoboot on anything that isn't x68k, sports lowercased autoexec.bat, is
 		<description>Skyblaster GR</description>
 		<year>1992</year>
 		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+pc9821: runs too fast
+]]></notes>
 		<info name="author" value="Tack" />
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
@@ -68940,6 +69179,24 @@ Doesn't autoboot on anything that isn't x68k, sports lowercased autoexec.bat, is
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1261568">
 				<rom name="mmk_cg_gallery_spent_runner_91.hdm" size="1261568" crc="c0425fb2" sha1="674f5610bdc53ca50a2dde2b6fad151966660991" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<!-- alt .2hd format known to exist, assume same but raw -->
+	<software name="sgunyan" supported="yes">
+		<description>Steel Gun Nyan</description>
+		<year>1992</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+Uses [DAC1BIT] for speech, controlled thru CPU frequency
+]]></notes>
+		<info name="alt_title" value="鋼鉄銃娘" /> <!-- with furigana スティールガンにゃん -->
+		<info name="author" value="Studio 玄米茶" />
+		<info name="usage" value="Boot from msdos50a floppy, insert a blank disk in drive B: and format /s B:. Once done do format a second time then insert this disk in drive A: and follow instructions. Game controls thru mouse." />
+		<part name="flop1" interface="floppy_5_25">
+			<dataarea name="flop" size="921600">
+				<rom name="steel_gun_nyan.fdi" size="921600" crc="acca23b9" sha1="01a74a18216823009d0c14888f052e8566f3ab05" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -69107,7 +69364,7 @@ Doesn't autoboot on anything that isn't x68k, sports lowercased autoexec.bat, is
 		</part>
 	</software>
 
-	<software name="towerzar" supported="no">
+	<software name="towerzar" supported="yes">
 		<description>The Tower of Zarbartz</description>
 		<year>1994</year>
 		<publisher>&lt;doujin&gt;</publisher>
@@ -69115,6 +69372,24 @@ Doesn't autoboot on anything that isn't x68k, sports lowercased autoexec.bat, is
 		<part name="flop1" interface="floppy_3_5">
 			<dataarea name="flop" size="1478656">
 				<rom name="tower of zarbartz (1994)(onion soft).fdi" size="1478656" crc="ccf623d6" sha1="109433411c26ee18b4ce09d8ab9abc6d451cd75e" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="touhou01" supported="no">
+		<description>Touhou Reiiden: The Highly Responsive to Prayers</description>
+		<year>1997</year>
+		<publisher>&lt;doujin&gt;</publisher>
+		<notes><![CDATA[
+No sound, access [OPNA] ROM from registers
+Eventually crashes with an out of heap memory, wants 550k minimum?
+]]></notes>
+		<info name="author" value="ZUN" />
+		<info name="alt_title" value="東方靈異伝 ～ The Highly Responsive to Prayers" />
+		<info name="usage" value="Requires HDD install from DOS" />
+		<part name="flop1" interface="floppy_3_5">
+			<dataarea name="flop" size="1265664">
+				<rom name="thdisk1.fdi" size="1265664" crc="19d4e3ee" sha1="9f3045f9d039176b0b0ece2b5cf1f15a2e8693a2" offset="0" />
 			</dataarea>
 		</part>
 	</software>
@@ -69234,7 +69509,7 @@ Doesn't autoboot on anything that isn't x68k, sports lowercased autoexec.bat, is
 
 	<software name="walpurn3" supported="no">
 		<description>Walpurgis Night 3</description>
-		<year>19??</year>
+		<year>1996</year>
 		<publisher>&lt;doujin&gt;</publisher>
 		<info name="author" value="Proper" />
 		<part name="flop1" interface="floppy_3_5">
@@ -70004,6 +70279,7 @@ Same as Police Quest 2 - Quest for Glory stand-alone disks
 		<year>1991</year>
 		<publisher>フェアリーテール (Fairytale)</publisher>
 		<info name="alt_title" value="花王フロッピー劇場 ルート246殺人案内" />
+		<!-- TODO: 3.5"? -->
 		<part name="flop1" interface="floppy_5_25">
 			<dataarea name="flop" size="1423360">
 				<rom name="ROUTE_246.fdi" size="1423360" crc="599a082e" sha1="3bd50e646c8f22efc88fa74e00b7ed6521f3d8df" offset="0" />
@@ -70085,6 +70361,74 @@ Driver disk for a PC-9801-86-compatible PCMCIA sound card
 		</part>
 	</software>
 
+	<software name="mslan21c" supported="no">
+		<!-- Origin: PC-9800 Series Central -->
+		<description>Microsoft LAN Manager for MS-DOS (v2.1c)</description>
+		<year>1997</year>
+		<publisher>マイクロソフト (Microsoft)</publisher>
+		<notes><![CDATA[
+Driver disks for [C-Bus] network cards
+]]></notes>
+		<!-- TODO: likely 3.5" -->
+		<part name="flop1" interface="floppy_5_25">
+			<!-- DOS SETUP -->
+			<feature name="part_id" value="Disk 1"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="disk1.hdm" size="1261568" crc="415787c1" sha1="2fe41958ac8e905453bf57c412da1220e40a15f1" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop2" interface="floppy_5_25">
+			<!-- DOS WORKSTATION -->
+			<feature name="part_id" value="Disk 2"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="disk2.hdm" size="1261568" crc="55547c26" sha1="a7a03e09e510d669d8f22bea01f3ea898f341229" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop3" interface="floppy_5_25">
+			<!-- DOS DRIVERS -->
+			<feature name="part_id" value="Disk 3"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="disk3.hdm" size="1261568" crc="dfe8260a" sha1="328ba94b6ab07b54d8d263137c267fbd53828808" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop4" interface="floppy_5_25">
+			<!-- NETWARE client -->
+			<feature name="part_id" value="Disk 4"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="disk4.hdm" size="1261568" crc="840eba05" sha1="b68040f17d677a523df2882634990c74bbbf1f3c" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop5" interface="floppy_5_25">
+			<!-- Windows 3.1 related -->
+			<feature name="part_id" value="Disk 5"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="disk5.hdm" size="1261568" crc="c5fd9f25" sha1="bb421c7af54c91d377535876fd11d80362a73c42" offset="0" />
+			</dataarea>
+		</part>
+		<part name="flop6" interface="floppy_5_25">
+			<!-- Windows 3.1 related? -->
+			<feature name="part_id" value="Disk 6"/>
+			<dataarea name="flop" size="1261568">
+				<rom name="disk6.hdm" size="1261568" crc="6b45307b" sha1="3ad3124069a074dc84e62454908007ffe9517e0f" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
+	<software name="pcfxga" supported="no">
+		<description>PC-FXGA (C-Bus version)</description>
+		<year>1995</year>
+		<publisher>NEC Home Electronics</publisher>
+		<notes><![CDATA[
+Install disk for [PC-FXGA]
+]]></notes>
+		<part name="flop1" interface="floppy_3_5">
+			<feature name="part_id" value="Install Disk" />
+			<dataarea name="flop" size="1265664">
+				<rom name="pc-fxga.fdi" size="1265664" crc="f2547992" sha1="1bcb715d02acfa89f75578bfa655b01db5726206" offset="0" />
+			</dataarea>
+		</part>
+	</software>
+
 	<software name="superems" supported="no">
 		<!-- Origin: Neo Kobe Collection -->
 		<description>Super EMS-98</description>
@@ -70140,7 +70484,7 @@ Japanese version of ibm5170:iomega
 	</software>
 
 	<software name="elecom">
-		<description>Ele Command (5.25&quot; Disk)</description>
+		<description>Ele Command (5.25&quot; disk)</description>
 		<!-- 1992/07/17 -->
 		<year>1992</year>
 		<publisher>Elecom</publisher>
@@ -70153,7 +70497,7 @@ Japanese version of ibm5170:iomega
 	</software>
 
 	<software name="elecom35" cloneof="elecom" supported="no">
-		<description>Ele Command (3.5&quot; Disk)</description>
+		<description>Ele Command (3.5&quot; disk)</description>
 		<!-- 1992/07/17 -->
 		<year>1992</year>
 		<publisher>Elecom</publisher>

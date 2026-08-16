@@ -50,7 +50,7 @@ public:
 	{
 	}
 
-	void thayers(machine_config &config);
+	void thayers(machine_config &config) ATTR_COLD;
 
 private:
 	virtual void machine_start() override ATTR_COLD;
@@ -125,8 +125,6 @@ private:
 
 void thayers_state::machine_start()
 {
-	m_digits.resolve();
-
 	m_intrq_timer = timer_alloc(FUNC(thayers_state::intrq_tick), this);
 
 	save_item(NAME(m_laserdisc_data));
@@ -671,24 +669,23 @@ void thayers_state::thayers(machine_config &config)
 	config.set_maximum_quantum(attotime::from_hz(262));
 
 	// video hardware
-	PIONEER_LDV1000HLE(config, m_player, 0);
+	PIONEER_LDV1000HLE(config, m_player);
 	m_player->set_screen("screen");
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_video_attributes(VIDEO_SELF_RENDER);
 	screen.set_raw(XTAL(14'318'181)*2, 910, 0, 704, 525, 44, 524);
 	screen.set_screen_update(m_player, FUNC(pioneer_ldv1000hle_device::screen_update));
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	m_player->add_route(0, "lspeaker", 1.0);
-	m_player->add_route(1, "rspeaker", 1.0);
+	SPEAKER(config, "speaker", 2).front();
+	m_player->add_route(0, "speaker", 1.0, 0);
+	m_player->add_route(1, "speaker", 1.0, 1);
 
 	SSI263HLE(config, m_ssi, 860000);
 	m_ssi->ar_callback().set(FUNC(thayers_state::ssi_data_request_w));
-	m_ssi->add_route(0, "lspeaker", 1.0);
-	m_ssi->add_route(1, "lspeaker", 1.0);
+	m_ssi->add_route(0, "speaker", 1.0, 0);
+	m_ssi->add_route(1, "speaker", 1.0, 0);
 }
 
 

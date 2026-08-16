@@ -385,18 +385,24 @@ uint32_t cyberbal_base_state::update_one_screen(screen_device &screen, bitmap_in
 
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = curmob.bitmap();
-	for (const sparse_dirty_rect *rect = curmob.first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->top(); y <= rect->bottom(); y++)
-		{
-			uint16_t const *const mo = &mobitmap.pix(y);
-			uint16_t *const pf = &bitmap.pix(y);
-			for (int x = rect->left(); x <= rect->right(); x++)
-				if (mo[x] != 0xffff)
+	curmob.iterate_dirty_rects(
+			cliprect,
+			[&bitmap, &mobitmap] (rectangle const &rect)
+			{
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
-					// not verified: logic is all controlled in a PAL
-					pf[x] = mo[x];
+					uint16_t const *const mo = &mobitmap.pix(y);
+					uint16_t *const pf = &bitmap.pix(y);
+					for (int x = rect.left(); x <= rect.right(); x++)
+					{
+						if (mo[x] != 0xffff)
+						{
+							// not verified: logic is all controlled in a PAL
+							pf[x] = mo[x];
+						}
+					}
 				}
-		}
+			});
 
 	// add the alpha on top
 	curalpha.draw(screen, bitmap, cliprect, 0, 0);
@@ -749,7 +755,7 @@ void cyberbal_state::cyberbal(machine_config &config)
 	m_mob2->set_config(cyberbal_state::s_mob_config);
 	m_mob2->set_gfxdecode("gfxdecode");
 
-	SCREEN(config, m_lscreen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_lscreen);
 	m_lscreen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	// note: these parameters are from published specs, not derived
 	// the board uses an SOS-2 chip to generate video signals
@@ -758,7 +764,7 @@ void cyberbal_state::cyberbal(machine_config &config)
 	m_lscreen->set_palette("lpalette");
 	m_lscreen->screen_vblank().set(FUNC(cyberbal_state::video_int_write_line)); // or is it "right?" har, har!
 
-	SCREEN(config, m_rscreen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_rscreen);
 	m_rscreen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	// note: these parameters are from published specs, not derived
 	// the board uses an SOS-2 chip to generate video signals
@@ -767,14 +773,13 @@ void cyberbal_state::cyberbal(machine_config &config)
 	m_rscreen->set_palette("rpalette");
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ATARI_SAC(config, m_sac);
 	m_sac->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_1);
 	m_sac->test_read_cb().set_ioport("IN0").bit(15);
-	m_sac->add_route(0, "lspeaker", 1.0);
-	m_sac->add_route(1, "rspeaker", 1.0);
+	m_sac->add_route(0, "speaker", 1.0, 0);
+	m_sac->add_route(1, "speaker", 1.0, 1);
 }
 
 void cyberbal_state::cyberbalt(machine_config &config)
@@ -812,7 +817,7 @@ void cyberbal2p_state::cyberbal2p(machine_config &config)
 	m_mob->set_config(cyberbal2p_state::s_mob_config);
 	m_mob->set_gfxdecode("gfxdecode");
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	// note: these parameters are from published specs, not derived
 	// the board uses an SOS-2 chip to generate video signals
@@ -824,7 +829,7 @@ void cyberbal2p_state::cyberbal2p(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ATARI_JSA_II(config, m_jsa, 0);
+	ATARI_JSA_II(config, m_jsa);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_3);
 	m_jsa->test_read_cb().set_ioport("IN2").bit(15);
 	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);

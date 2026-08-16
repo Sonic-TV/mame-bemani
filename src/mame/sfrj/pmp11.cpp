@@ -30,7 +30,7 @@ private:
 	required_device<t11_device> m_maincpu;
 	required_device<i8251_device> m_uart1;
 	required_device<i8251_device> m_uart2;
-	required_device<wd2797_device> m_fdc;	
+	required_device<wd2797_device> m_fdc;
 };
 
 void pmp11_state::pdp11_mem(address_map &map)
@@ -75,7 +75,7 @@ void pmp11_state::pmp11(machine_config &config)
 	uart_clock.signal_handler().append(m_uart2, FUNC(i8251_device::write_txc));
 	uart_clock.signal_handler().append(m_uart2, FUNC(i8251_device::write_rxc));
 
-	I8251(config, m_uart1, 0);
+	I8251(config, m_uart1);
 	m_uart1->txd_handler().set("rs232a", FUNC(rs232_port_device::write_txd));
 	m_uart1->dtr_handler().set("rs232a", FUNC(rs232_port_device::write_dtr));
 	m_uart1->rts_handler().set("rs232a", FUNC(rs232_port_device::write_rts));
@@ -86,7 +86,7 @@ void pmp11_state::pmp11(machine_config &config)
 	rs232a.cts_handler().set("uart1", FUNC(i8251_device::write_cts));
 	rs232a.set_option_device_input_defaults("terminal", DEVICE_INPUT_DEFAULTS_NAME(terminal));
 
-	I8251(config, m_uart2, 0);
+	I8251(config, m_uart2);
 	m_uart2->txd_handler().set("rs232b", FUNC(rs232_port_device::write_txd));
 	m_uart2->dtr_handler().set("rs232b", FUNC(rs232_port_device::write_dtr));
 	m_uart2->rts_handler().set("rs232b", FUNC(rs232_port_device::write_rts));
@@ -95,8 +95,8 @@ void pmp11_state::pmp11(machine_config &config)
 	rs232b.rxd_handler().set("uart2", FUNC(i8251_device::write_rxd));
 	rs232b.dsr_handler().set("uart2", FUNC(i8251_device::write_dsr));
 	rs232b.cts_handler().set("uart2", FUNC(i8251_device::write_cts));
-	
-	WD2797(config, m_fdc, 8_MHz_XTAL / 4); 
+
+	WD2797(config, m_fdc, 8_MHz_XTAL / 4);
 }
 
 ROM_START( pmp11 )

@@ -79,7 +79,7 @@ sgi_ip4_device::sgi_ip4_device(machine_config const &mconfig, char const *tag, d
 	, m_cpu(*this, "cpu")
 	, m_rtc(*this, "rtc")
 	, m_pit(*this, "pit")
-	, m_scsi(*this, "scsi:0:wd33c93")
+	, m_scsi(*this, "wd33c93")
 	, m_duart(*this, "duart%u", 0U)
 	, m_serial(*this, "serial%u", 0U)
 	, m_saa(*this, "saa")
@@ -226,16 +226,13 @@ void sgi_ip4_device::device_add_mconfig(machine_config &config)
 	m_pit->out_handler<2>().set(m_pit, FUNC(pit8254_device::write_clk0));
 	m_pit->out_handler<2>().append(m_pit, FUNC(pit8254_device::write_clk1));
 
-	NSCSI_BUS(config, "scsi");
-	NSCSI_CONNECTOR(config, "scsi:0").option_set("wd33c93", WD33C93).machine_config(
-		[this](device_t *device)
-		{
-			wd33c9x_base_device &wd33c93(downcast<wd33c9x_base_device &>(*device));
+	auto &scsi(NSCSI_BUS(config, "scsi"));
 
-			wd33c93.set_clock(10'000'000);
-			wd33c93.irq_cb().set(*this, FUNC(sgi_ip4_device::lio_irq<LIO_SCSI>)).invert();
-			wd33c93.drq_cb().set(*this, FUNC(sgi_ip4_device::scsi_drq));
-		});
+	WD33C93(config, m_scsi, 10'000'000);
+	scsi.set_external_device(0, m_scsi);
+	m_scsi->irq_cb().set(DEVICE_SELF, FUNC(sgi_ip4_device::lio_irq<LIO_SCSI>)).invert();
+	m_scsi->drq_cb().set(DEVICE_SELF, FUNC(sgi_ip4_device::scsi_drq));
+
 	NSCSI_CONNECTOR(config, "scsi:1", scsi_devices, "harddisk", false);
 	NSCSI_CONNECTOR(config, "scsi:2", scsi_devices, nullptr, false);
 	NSCSI_CONNECTOR(config, "scsi:3", scsi_devices, nullptr, false);
@@ -323,12 +320,11 @@ void sgi_ip4_device::device_add_mconfig(machine_config &config)
 	m_serial[3]->dcd_handler().set(m_duart[2], FUNC(scn2681_device::ip2_w));
 
 	// TODO: move speakers to host
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	SAA1099(config, m_saa, 8_MHz_XTAL);
-	m_saa->add_route(0, "lspeaker", 0.5);
-	m_saa->add_route(1, "rspeaker", 0.5);
+	m_saa->add_route(0, "speaker", 0.5, 0);
+	m_saa->add_route(1, "speaker", 0.5, 1);
 
 	// TODO: ACFAIL -> vme_irq<0>
 	device_vme_card_interface::vme_irq<1>().set(*this, FUNC(sgi_ip4_device::vme_irq<1>));
@@ -344,8 +340,6 @@ void sgi_ip4_device::device_add_mconfig(machine_config &config)
 
 void sgi_ip4_device::device_start()
 {
-	m_leds.resolve();
-
 	save_item(NAME(m_cpucfg));
 	save_item(NAME(m_dma_lo));
 	save_item(NAME(m_dma_hi));

@@ -209,23 +209,30 @@ uint32_t blstroid_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_mob->bitmap();
-	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->top(); y <= rect->bottom(); y++)
-		{
-			uint16_t const *const mo = &mobitmap.pix(y);
-			uint16_t *const pf = &bitmap.pix(y);
-			for (int x = rect->left(); x <= rect->right(); x++)
-				if (mo[x] != 0xffff)
+	m_mob->iterate_dirty_rects(
+			cliprect,
+			[this, &bitmap, &mobitmap] (rectangle const &rect)
+			{
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
-					/* verified via schematics
+					uint16_t const *const mo = &mobitmap.pix(y);
+					uint16_t *const pf = &bitmap.pix(y);
+					for (int x = rect.left(); x <= rect.right(); x++)
+					{
+						if (mo[x] != 0xffff)
+						{
+							/* verified via schematics
 
-					    priority address = HPPPMMMM
-					*/
-					int const priaddr = ((pf[x] & 8) << 4) | (pf[x] & 0x70) | ((mo[x] & 0xf0) >> 4);
-					if (m_priorityram[priaddr] & 1)
-						pf[x] = mo[x];
+							    priority address = HPPPMMMM
+							*/
+							int const priaddr = ((pf[x] & 8) << 4) | (pf[x] & 0x70) | ((mo[x] & 0xf0) >> 4);
+							if (m_priorityram[priaddr] & 1)
+								pf[x] = mo[x];
+						}
+					}
 				}
-		}
+			});
+
 	return 0;
 }
 
@@ -386,10 +393,10 @@ void blstroid_state::blstroid(machine_config &config)
 
 	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 16, 8, TILEMAP_SCAN_ROWS, 64, 32).set_info_callback(FUNC(blstroid_state::get_playfield_tile_info));
 
-	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, blstroid_state::s_mob_config);
+	ATARI_MOTION_OBJECTS(config, m_mob, m_screen, blstroid_state::s_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	// note: these parameters are from published specs, not derived
 	// the board uses an SOS-2 chip to generate video signals
@@ -399,14 +406,13 @@ void blstroid_state::blstroid(machine_config &config)
 	m_screen->screen_vblank().set_inputline(m_maincpu, M68K_IRQ_2, ASSERT_LINE);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	ATARI_JSA_I(config, m_jsa, 0);
+	ATARI_JSA_I(config, m_jsa);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_4);
 	m_jsa->test_read_cb().set_ioport("IN0").bit(7);
-	m_jsa->add_route(0, "lspeaker", 1.0);
-	m_jsa->add_route(1, "rspeaker", 1.0);
+	m_jsa->add_route(0, "speaker", 1.0, 0);
+	m_jsa->add_route(1, "speaker", 1.0, 1);
 	config.device_remove("jsa:pokey");
 	config.device_remove("jsa:tms");
 }

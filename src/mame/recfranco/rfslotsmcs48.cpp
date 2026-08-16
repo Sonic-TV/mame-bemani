@@ -84,12 +84,14 @@ public:
 		, m_outbit(*this, "outbit%u", 0U)
 	{ }
 
-	void rf_3115_base(machine_config &config);
-	void ajofrin(machine_config &config);
-	void babyfrts(machine_config &config);
+	void ajofrin(machine_config &config) ATTR_COLD;
+	void babyfrts(machine_config &config) ATTR_COLD;
 
 protected:
 	virtual void machine_start() override ATTR_COLD;
+
+	void rf_3115_base(machine_config &config) ATTR_COLD;
+
 	memory_share_creator<uint8_t> m_data_ram;
 
 	required_device<i8035_device> m_maincpu;
@@ -162,7 +164,7 @@ private:
 
 void rfslotsmcs48_state::machine_start()
 {
-	m_outbit.resolve();
+	// TODO: savestates
 }
 
 
@@ -553,7 +555,7 @@ void rfslotsmcs48_state::hopper_decode()
 
 */
 	u8 res = 0xff;
-	if(!BIT(m_hdecode, 0) & (!BIT(m_hdecode, 1)))  // g1&g2=0
+	if(!BIT(m_hdecode, 0, 2))  // active low
 	{
 		u8 a, b, c, d;
 		d = BIT(m_maincpu->p1_r(), 6);

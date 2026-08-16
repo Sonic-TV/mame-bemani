@@ -137,6 +137,8 @@ Notes:
 #include "screen.h"
 #include "speaker.h"
 
+#define VERBOSE (0)
+#include "logmacro.h"
 
 namespace {
 
@@ -341,9 +343,7 @@ void ssfindo_state::io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 	uint32_t temp = 0;
 	COMBINE_DATA(&temp);
 
-#if 0
-	logerror("[io_w] = %x @%x [latch=%x]\n",data,m_maincpu->pc(),m_adrLatch);
-#endif
+	LOG("%s: [io_w] %x [latch=%x]\n", machine().describe_context(), data, m_adrLatch);
 
 	if(m_adrLatch==1)
 		m_flashAdr=(temp>>16)&0xff;
@@ -357,9 +357,10 @@ void ssfindo_state::io_w(offs_t offset, uint32_t data, uint32_t mem_mask)
 
 void ssfindo_state::debug_w(uint32_t data)
 {
-#if 0
-	osd_printf_debug("%c",data&0xff); //debug texts - malloc (ie "64 KBytes allocated, elapsed : 378 KBytes, free : 2231 KBytes")
-#endif
+	if (0)
+	{
+		osd_printf_debug("%c", data & 0xff); //debug texts - malloc (ie "64 KBytes allocated, elapsed : 378 KBytes, free : 2231 KBytes")
+	}
 }
 
 uint32_t ssfindo_state::ff4_r()
@@ -617,7 +618,7 @@ void ssfindo_state::ssfindo(machine_config &config)
 
 	I2C_24C01(config, m_i2cmem);
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	ARM_VIDC20(config, m_vidc, 24_MHz_XTAL);
 	m_vidc->set_screen("screen");
@@ -630,15 +631,14 @@ void ssfindo_state::ssfindo(machine_config &config)
 	m_iomd->iolines_read().set(FUNC(ssfindo_state::iolines_r));
 	m_iomd->iolines_write().set(FUNC(ssfindo_state::iolines_w));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	qs1000_device &qs1000(QS1000(config, "qs1000", 24_MHz_XTAL));
 	qs1000.set_external_rom(true);
 	// qs1000.p1_out().set(FUNC()); // TODO: writes something here
 	qs1000.p3_in().set([this]() { return u8(0xfeU | m_txd); });
-	qs1000.add_route(0, "lspeaker", 0.25);
-	qs1000.add_route(1, "rspeaker", 0.25);
+	qs1000.add_route(0, "speaker", 0.25, 0);
+	qs1000.add_route(1, "speaker", 0.25, 1);
 }
 
 void ssfindo_state::ppcar(machine_config &config)

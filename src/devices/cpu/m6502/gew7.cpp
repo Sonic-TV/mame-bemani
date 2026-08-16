@@ -20,13 +20,13 @@ DEFINE_DEVICE_TYPE(GEW7, gew7_device, "gew7", "Yamaha YMW270-F (GEW7)")
 
 gew7_device::gew7_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: m6502_mcu_device_base<w65c02_device>(mconfig, GEW7, tag, owner, clock)
-	, device_mixer_interface(mconfig, *this, 2)
+	, device_mixer_interface(mconfig, *this)
 	, m_in_cb(*this, 0xff), m_out_cb(*this)
 	, m_rom(*this, DEVICE_SELF)
 	, m_bank(*this, "bank%u", 0U)
 	, m_pcm(*this, "pcm")
 {
-	program_config.m_internal_map = address_map_constructor(FUNC(gew7_device::internal_map), this);
+	m_program_config.m_internal_map = address_map_constructor(FUNC(gew7_device::internal_map), this);
 
 	std::fill(std::begin(m_port_force_bits), std::end(m_port_force_bits), 0);
 	std::fill(std::begin(m_port_force_mask), std::end(m_port_force_mask), 0);
@@ -37,8 +37,8 @@ void gew7_device::device_add_mconfig(machine_config &config)
 {
 	GEW7_PCM(config, m_pcm, DERIVED_CLOCK(1, 1));
 	m_pcm->set_device_rom_tag(m_rom);
-	m_pcm->add_route(0, *this, 1.0, AUTO_ALLOC_INPUT, 0);
-	m_pcm->add_route(1, *this, 1.0, AUTO_ALLOC_INPUT, 1);
+	m_pcm->add_route(0, *this, 1.0, 0);
+	m_pcm->add_route(1, *this, 1.0, 1);
 }
 
 void gew7_device::device_start()

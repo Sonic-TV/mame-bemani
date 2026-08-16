@@ -285,8 +285,8 @@ void k573dio_device::device_add_mconfig(machine_config &config)
 	m_mas3507d->demand_cb().set(*this, FUNC(k573dio_device::mpeg_demand));
 	m_mas3507d->mpeg_crc_error_cb().set(*this, FUNC(k573dio_device::mpeg_crc_error));
 	m_mas3507d->i2s_soi_cb().set(*this, FUNC(k573dio_device::mpeg_frame_identification));
-	m_mas3507d->add_route(0, ":lspeaker", 1.0);
-	m_mas3507d->add_route(1, ":rspeaker", 1.0);
+	m_mas3507d->add_route(0, ":speaker", 1.0, 0);
+	m_mas3507d->add_route(1, ":speaker", 1.0, 1);
 
 	DS2401(config, m_digital_id);
 

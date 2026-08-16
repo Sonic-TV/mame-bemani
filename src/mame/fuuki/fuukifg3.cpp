@@ -624,7 +624,7 @@ void fuuki32_state::fuuki32(machine_config &config)
 	soundcpu.set_addrmap(AS_IO, &fuuki32_state::sound_io_map);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(64 * 8, 32 * 8);
 	m_screen->set_visarea(0, 40 * 8 - 1, 0, 30 * 8 - 1);
@@ -635,14 +635,14 @@ void fuuki32_state::fuuki32(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_fuuki32);
 	PALETTE(config, m_palette, palette_device::BLACK).set_format(palette_device::xRGB_555, 0x4000 / 2);
 
-	FUUKI_SPRITE(config, m_fuukispr, 0);
+	FUUKI_SPRITE(config, m_fuukispr);
 	m_fuukispr->set_palette(m_palette);
 	m_fuukispr->set_color_base(0x400*2);
 	m_fuukispr->set_color_num(0x40);
 	m_fuukispr->set_tile_callback(FUNC(fuuki32_state::spr_tile_cb));
 	m_fuukispr->set_colpri_callback(FUNC(fuuki32_state::spr_colpri_cb));
 
-	FUUKI_TILEMAP(config, m_fuukitmap, 0, m_palette, gfx_fuuki32);
+	FUUKI_TILEMAP(config, m_fuukitmap, m_palette, gfx_fuuki32);
 	m_fuukitmap->set_screen(m_screen);
 	m_fuukitmap->set_colour_callback(FUNC(fuuki32_state::tmap_colour_cb));
 	m_fuukitmap->level_1_irq_callback().set_inputline(m_maincpu, 1, HOLD_LINE);
@@ -652,17 +652,16 @@ void fuuki32_state::fuuki32(machine_config &config)
 	m_fuukitmap->set_yoffs(0x3f6, 0x2c7);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ymf278b_device &ymf(YMF278B(config, "ymf", 33.8688_MHz_XTAL));
 	ymf.irq_handler().set_inputline("soundcpu", 0);
-	ymf.add_route(0, "lspeaker", 0.50);
-	ymf.add_route(1, "rspeaker", 0.50);
-	ymf.add_route(2, "lspeaker", 0.40);
-	ymf.add_route(3, "rspeaker", 0.40);
-	ymf.add_route(4, "lspeaker", 0.50);
-	ymf.add_route(5, "rspeaker", 0.50);
+	ymf.add_route(0, "speaker", 0.50, 0);
+	ymf.add_route(1, "speaker", 0.50, 1);
+	ymf.add_route(2, "speaker", 0.40, 0);
+	ymf.add_route(3, "speaker", 0.40, 1);
+	ymf.add_route(4, "speaker", 0.50, 0);
+	ymf.add_route(5, "speaker", 0.50, 1);
 }
 
 //-------------------------------------------------

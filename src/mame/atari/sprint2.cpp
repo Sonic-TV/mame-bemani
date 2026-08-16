@@ -289,8 +289,6 @@ void sprint2_state::screen_vblank(int state)
 
 void sprint2_state::machine_start()
 {
-	m_gear_sel.resolve();
-
 	save_item(NAME(m_steering));
 	save_item(NAME(m_gear));
 	save_item(NAME(m_dial));
@@ -774,7 +772,7 @@ void sprint2_state::sprint2(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count(m_screen, 8);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(12.096_MHz_XTAL, 768, 0, 512, 262, 0, 224);
 	m_screen->set_screen_update(FUNC(sprint2_state::screen_update));
 	m_screen->screen_vblank().set(FUNC(sprint2_state::screen_vblank));
@@ -784,8 +782,7 @@ void sprint2_state::sprint2(machine_config &config)
 	PALETTE(config, m_palette, FUNC(sprint2_state::palette), 12, 4);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	F9334(config, m_outlatch); // at H8
 	m_outlatch->q_out_cb<0>().set("discrete", FUNC(discrete_device::write_line<SPRINT2_ATTRACT_EN>)); // also DOMINOS_ATTRACT_EN
@@ -796,8 +793,8 @@ void sprint2_state::sprint2(machine_config &config)
 	//m_outlatch->q_out_cb<6>().set(FUNC(sprint2_state::spare_w));
 
 	DISCRETE(config, m_discrete, sprint2_discrete);
-	m_discrete->add_route(0, "lspeaker", 1.0);
-	m_discrete->add_route(1, "rspeaker", 1.0);
+	m_discrete->add_route(0, "speaker", 1.0, 0);
+	m_discrete->add_route(1, "speaker", 1.0, 1);
 }
 
 
@@ -806,8 +803,7 @@ void sprint2_state::sprint1(machine_config &config)
 	sprint2(config);
 
 	// sound hardware
-	config.device_remove("lspeaker");
-	config.device_remove("rspeaker");
+	config.device_remove("speaker");
 	SPEAKER(config, "mono").front_center();
 
 	DISCRETE(config.replace(), m_discrete, sprint1_discrete).add_route(ALL_OUTPUTS, "mono", 1.0);

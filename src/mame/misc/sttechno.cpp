@@ -615,7 +615,7 @@ void sttechno_state::shambros(machine_config &config)
 	M68000(config, m_maincpu, XTAL(42'954'545) / 2); // divisor guessed, anything slower and the game stops functioning (timer flickers, CD-ROM reads are too slow)
 	m_maincpu->set_addrmap(AS_PROGRAM, &sttechno_state::cpu_map);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(42'954'545) / 6, 456, 0, 336, 262, 0, 240); // guessed
 	screen.set_screen_update(FUNC(sttechno_state::screen_update));
 	screen.screen_vblank().set_inputline(m_maincpu, M68K_IRQ_2);
@@ -630,13 +630,12 @@ void sttechno_state::shambros(machine_config &config)
 	FUJITSU_29F160TE_16BIT(config, m_flash[1]);
 	FUJITSU_29F160TE_16BIT(config, m_video_flash);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	STT_SA1(config, m_sound, XTAL(42'954'545) / 3);
 	m_sound->set_addrmap(0, &sttechno_state::sound_map);
-	m_sound->add_route(0, "lspeaker", 1.0);
-	m_sound->add_route(1, "rspeaker", 1.0);
+	m_sound->add_route(0, "speaker", 1.0, 0);
+	m_sound->add_route(1, "speaker", 1.0, 1);
 	TIMER(config, "irq6_timer").configure_periodic(FUNC(sttechno_state::irq6_timer), attotime::from_hz(XTAL(42'954'545) / 3 / 448 / 128)); // probably some interrupt?
 
 	RS232_PORT(config, m_rs232, sttechno_debug_serial_devices, nullptr);

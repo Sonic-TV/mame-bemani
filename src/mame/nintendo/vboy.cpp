@@ -29,6 +29,8 @@ TODO:
 #include "softlist_dev.h"
 #include "speaker.h"
 
+#include <iostream>
+
 #include "vboy.lh"
 
 
@@ -811,7 +813,7 @@ uint16_t vboy_state::vip_io_r(offs_t offset)
 		case 0x42:  //XPCTRL
 					return m_vip_io.XPCTRL;
 		case 0x44:  //VER
-					printf("%08x read VER\n",m_maincpu->pc());
+					util::stream_format(std::cout, "%08x read VER\n",m_maincpu->pc());
 					return m_vip_io.VER;
 		case 0x48:  //SPT0
 					return m_vip_io.SPT[0];
@@ -1251,13 +1253,13 @@ void vboy_state::vboy(machine_config &config)
 	PALETTE(config, m_palette, FUNC(vboy_state::vboy_palette), 4);
 
 	/* Left screen */
-	screen_device &lscreen(SCREEN(config, "3dleft", SCREEN_TYPE_LCD));
+	screen_device &lscreen(SCREEN(config, "3dleft").set_lcd());
 	lscreen.set_raw(XTAL(20'000'000)/2,757,0,384,264,0,224);
 	lscreen.set_screen_update(FUNC(vboy_state::screen_update_left));
 	lscreen.set_palette(m_palette);
 
 	/* Right screen */
-	screen_device &rscreen(SCREEN(config, "3dright", SCREEN_TYPE_LCD));
+	screen_device &rscreen(SCREEN(config, "3dright").set_lcd());
 	rscreen.set_raw(XTAL(20'000'000)/2,757,0,384,264,0,224);
 	rscreen.set_screen_update(FUNC(vboy_state::screen_update_right));
 	rscreen.set_palette(m_palette);
@@ -1273,11 +1275,10 @@ void vboy_state::vboy(machine_config &config)
 	SOFTWARE_LIST(config, "cart_list").set_original("vboy");
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	vboysnd_device &vbsnd(VBOYSND(config, "vbsnd"));
-	vbsnd.add_route(0, "lspeaker", 1.0);
-	vbsnd.add_route(1, "rspeaker", 1.0);
+	vbsnd.add_route(0, "speaker", 1.0, 0);
+	vbsnd.add_route(1, "speaker", 1.0, 1);
 }
 
 /* ROM definition */

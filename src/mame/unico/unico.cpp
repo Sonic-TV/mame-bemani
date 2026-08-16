@@ -57,10 +57,9 @@ public:
 		m_spriteram(*this, "spriteram", 0x800, ENDIANNESS_BIG)
 	{ }
 
-	void burglarx(machine_config &config);
+	void burglarx(machine_config &config) ATTR_COLD;
 
 protected:
-	virtual void machine_start() override ATTR_COLD;
 	virtual void video_start() override ATTR_COLD;
 
 	static rgb_t unico_R6G6B6X(uint32_t raw);
@@ -368,8 +367,6 @@ void burglarx_state::draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, c
 
 uint32_t burglarx_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {
-	int layers_ctrl = -1;
-
 	m_tilemap[0]->set_scrollx(0, m_scroll[0x00]);
 	m_tilemap[0]->set_scrolly(0, m_scroll[0x01]);
 
@@ -379,28 +376,16 @@ uint32_t burglarx_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 	m_tilemap[2]->set_scrollx(0, m_scroll[0x04]);
 	m_tilemap[2]->set_scrolly(0, m_scroll[0x02]);
 
-#ifdef MAME_DEBUG
-if ( machine().input().code_pressed(KEYCODE_Z) || machine().input().code_pressed(KEYCODE_X) )
-{
-	int msk = 0;
-	if (machine().input().code_pressed(KEYCODE_Q))  msk |= 1;
-	if (machine().input().code_pressed(KEYCODE_W))  msk |= 2;
-	if (machine().input().code_pressed(KEYCODE_E))  msk |= 4;
-	if (machine().input().code_pressed(KEYCODE_A))  msk |= 8;
-	if (msk != 0) layers_ctrl &= msk;
-}
-#endif
-
 	// The background color is the first of the last palette
 	bitmap.fill(0x1f00, cliprect);
 	screen.priority().fill(0, cliprect);
 
-	if (layers_ctrl & 1)    m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 1);
-	if (layers_ctrl & 2)    m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 2);
-	if (layers_ctrl & 4)    m_tilemap[2]->draw(screen, bitmap, cliprect, 0, 4);
+	m_tilemap[0]->draw(screen, bitmap, cliprect, 0, 1);
+	m_tilemap[1]->draw(screen, bitmap, cliprect, 0, 2);
+	m_tilemap[2]->draw(screen, bitmap, cliprect, 0, 4);
 
 	// Sprites are drawn last, using pdrawgfx
-	if (layers_ctrl & 8)    draw_sprites(screen, bitmap, cliprect);
+	draw_sprites(screen, bitmap, cliprect);
 
 	return 0;
 }
@@ -903,12 +888,6 @@ GFXDECODE_END
 ***************************************************************************/
 
 
-void burglarx_state::machine_start()
-{
-	m_leds.resolve();
-}
-
-
 /***************************************************************************
                                 Burglar X
 ***************************************************************************/
@@ -921,7 +900,7 @@ void burglarx_state::burglarx(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(burglarx_state::irq2_line_hold));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(384, 224);
@@ -933,16 +912,15 @@ void burglarx_state::burglarx(machine_config &config)
 	PALETTE(config, m_palette).set_format(4, &burglarx_state::unico_R6G6B6X, 8192);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(14'318'181) / 4)); // 3.579545 MHz
-	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 0.40);
-	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 0.40);
+	ymsnd.add_route(ALL_OUTPUTS, "speaker", 0.40, 0);
+	ymsnd.add_route(ALL_OUTPUTS, "speaker", 0.40, 1);
 
 	OKIM6295(config, m_oki, 32_MHz_XTAL / 32, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
-	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 0.80);
-	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 0.80);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.80, 0);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.80, 1);
 }
 
 
@@ -965,7 +943,7 @@ void zeropnt_state::zeropnt(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(zeropnt_state::irq2_line_hold));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(384, 224);
@@ -977,17 +955,16 @@ void zeropnt_state::zeropnt(machine_config &config)
 	PALETTE(config, m_palette).set_format(4, &zeropnt_state::unico_R6G6B6X, 8192);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym3812_device &ymsnd(YM3812(config, "ymsnd", XTAL(14'318'181) / 4)); // 3.579545 MHz
-	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 0.40);
-	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 0.40);
+	ymsnd.add_route(ALL_OUTPUTS, "speaker", 0.40, 0);
+	ymsnd.add_route(ALL_OUTPUTS, "speaker", 0.40, 1);
 
 	OKIM6295(config, m_oki, 32_MHz_XTAL / 32, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 verified
 	m_oki->set_addrmap(0, &zeropnt_state::oki_map);
-	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 0.80);
-	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 0.80);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.80, 0);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.80, 1);
 }
 
 
@@ -1012,7 +989,7 @@ void zeropnt2_state::zeropnt2(machine_config &config)
 	EEPROM_93C46_8BIT(config, "eeprom");
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(384, 224);
@@ -1024,19 +1001,18 @@ void zeropnt2_state::zeropnt2(machine_config &config)
 	PALETTE(config, m_palette).set_format(4, &zeropnt2_state::unico_R6G6B6X, 8192);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	YM2151(config, "ymsnd", XTAL(14'318'181) / 4).add_route(0, "lspeaker", 0.70).add_route(1, "rspeaker", 0.70); // 3.579545 MHz
+	YM2151(config, "ymsnd", XTAL(14'318'181) / 4).add_route(0, "speaker", 0.70, 0).add_route(1, "speaker", 0.70, 1); // 3.579545 MHz
 
 	okim6295_device &oki1(OKIM6295(config, "oki1", 32_MHz_XTAL/32, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
 	oki1.set_addrmap(0, &zeropnt2_state::oki_map);
-	oki1.add_route(ALL_OUTPUTS, "lspeaker", 0.40);
-	oki1.add_route(ALL_OUTPUTS, "rspeaker", 0.40);
+	oki1.add_route(ALL_OUTPUTS, "speaker", 0.40, 0);
+	oki1.add_route(ALL_OUTPUTS, "speaker", 0.40, 1);
 
 	okim6295_device &oki2(OKIM6295(config, "oki2", XTAL(14'318'181)/4, okim6295_device::PIN7_HIGH)); // clock frequency & pin 7 not verified
-	oki2.add_route(ALL_OUTPUTS, "lspeaker", 0.20);
-	oki2.add_route(ALL_OUTPUTS, "rspeaker", 0.20);
+	oki2.add_route(ALL_OUTPUTS, "speaker", 0.20, 0);
+	oki2.add_route(ALL_OUTPUTS, "speaker", 0.20, 1);
 }
 
 

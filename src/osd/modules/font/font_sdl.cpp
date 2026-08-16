@@ -1,13 +1,13 @@
 // license:BSD-3-Clause
 // copyright-holders:Olivier Galibert, R. Belmont, Vas Crabb
 /*
- * font_sdl.c
+ * font_sdl.cpp
  *
  */
 
 #include "font_module.h"
 
-#if defined(SDLMAME_UNIX) && !defined(SDLMAME_MACOSX) && !defined(SDLMAME_HAIKU) && !defined(SDLMAME_ANDROID) && !defined(SDLMAME_DDRMINI)
+#if defined(SDLMAME_UNIX) && !defined(SDLMAME_MACOSX) && !defined(SDLMAME_HAIKU) && !defined(SDLMAME_ANDROID) && !defined(SDLMAME_SDL3) && !defined(SDLMAME_DDRMINI)
 
 #include "corestr.h"
 #include "emucore.h"

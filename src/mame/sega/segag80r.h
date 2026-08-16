@@ -34,8 +34,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_mainram(*this, "mainram"),
 		m_videoram(*this, "videoram"),
-		m_sn1(*this, "sn1"),
-		m_sn2(*this, "sn2"),
+		m_sn(*this, "sn%u", 1U),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
 		m_soundbrd(*this, "soundbrd"),
@@ -75,18 +74,12 @@ public:
 
 	uint8_t m_sound_state[2]{};
 	uint8_t m_sound_rate = 0;
-	uint16_t m_sound_addr = 0;
-	uint8_t m_sound_data = 0;
-	uint8_t m_square_state = 0;
-	uint8_t m_square_count = 0;
-	inline void sega005_update_sound_data();
 
 private:
 	required_shared_ptr<uint8_t> m_mainram;
 	required_shared_ptr<uint8_t> m_videoram;
 
-	optional_device<sn76496_device> m_sn1;
-	optional_device<sn76496_device> m_sn2;
+	optional_device_array<sn76496_device, 2> m_sn;
 	required_device<cpu_device> m_maincpu;
 	optional_device<cpu_device> m_audiocpu;
 	optional_device<monsterb_sound_device> m_soundbrd;
@@ -152,8 +145,7 @@ private:
 
 	void usb_ram_w(offs_t offset, uint8_t data);
 	void sindbadm_misc_w(uint8_t data);
-	void sindbadm_sn1_SN76496_w(uint8_t data);
-	void sindbadm_sn2_SN76496_w(uint8_t data);
+	template <int N> void sindbadm_sn_w(uint8_t data);
 
 	TILE_GET_INFO_MEMBER(spaceod_get_tile_info);
 	TILEMAP_MAPPER_MEMBER(spaceod_scan_rows);
@@ -191,33 +183,7 @@ private:
 };
 
 
-/*----------- defined in audio/segag80r.c -----------*/
-
-
-class sega005_sound_device : public device_t,
-									public device_sound_interface
-{
-public:
-	sega005_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-
-	emu_timer *m_sega005_sound_timer;
-	sound_stream *m_sega005_stream;
-
-protected:
-	// device-level overrides
-	virtual void device_start() override ATTR_COLD;
-
-	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
-
-private:
-	// internal state
-	TIMER_CALLBACK_MEMBER( sega005_auto_timer );
-};
-
-DECLARE_DEVICE_TYPE(SEGA005, sega005_sound_device)
-
-/*----------- defined in video/segag80r.c -----------*/
+/*----------- defined in segag80r_v.cpp -----------*/
 
 #define G80_BACKGROUND_NONE         0
 #define G80_BACKGROUND_SPACEOD      1

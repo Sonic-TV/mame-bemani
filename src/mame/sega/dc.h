@@ -74,9 +74,10 @@ public:
 	void aica_irq(int state);
 	void sh4_aica_irq(int state);
 	void external_irq(int state);
+	void maple_trigger(int state) { m_maple->maple_hw_trigger(); }
 
 
-	required_device<sh4_base_device> m_maincpu;
+	required_device<sh7091_device> m_maincpu;
 	required_device<cpu_device> m_soundcpu;
 	required_device<powervr2_device> m_powervr2;
 	required_device<maple_dc_device> m_maple;

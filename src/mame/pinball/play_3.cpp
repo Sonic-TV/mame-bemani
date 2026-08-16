@@ -95,12 +95,16 @@ public:
 		, m_io_outputs(*this, "out%d", 0U)
 	{ }
 
-	void play_3(machine_config &config);
-	void spain82(machine_config &config);
-	void flashman(machine_config &config);
-	void megaaton(machine_config &config);
-	void sklflite(machine_config &config);
-	void terrlake(machine_config &config);
+	void play_3(machine_config &config) ATTR_COLD;
+	void spain82(machine_config &config) ATTR_COLD;
+	void flashman(machine_config &config) ATTR_COLD;
+	void megaaton(machine_config &config) ATTR_COLD;
+	void sklflite(machine_config &config) ATTR_COLD;
+	void terrlake(machine_config &config) ATTR_COLD;
+
+protected:
+	virtual void machine_reset() override ATTR_COLD;
+	virtual void machine_start() override ATTR_COLD;
 
 private:
 	void port01_w(u8 data);
@@ -143,8 +147,6 @@ private:
 	u8 m_kbdrow = 0U;
 	u8 m_segment[5]{};
 	bool m_disp_sw = false;
-	virtual void machine_reset() override ATTR_COLD;
-	virtual void machine_start() override ATTR_COLD;
 	required_device<cosmac_device> m_maincpu;
 	optional_device<cosmac_device> m_audiocpu;
 	required_device<ttl7474_device> m_4013a;
@@ -320,9 +322,6 @@ void play_3_state::machine_start()
 {
 	genpin_class::machine_start();
 
-	m_digits.resolve();
-	m_io_outputs.resolve();
-
 	save_item(NAME(m_resetcnt_a));
 	save_item(NAME(m_port03_old));
 	save_item(NAME(m_a_irqset));
@@ -337,6 +336,7 @@ void play_3_state::machine_start()
 void play_3_state::machine_reset()
 {
 	genpin_class::machine_reset();
+
 	for (u8 i = 0; i < m_io_outputs.size(); i++)
 		m_io_outputs[i] = 0;
 
@@ -575,11 +575,11 @@ void play_3_state::play_3(machine_config &config)
 	xpoint.signal_handler().set(FUNC(play_3_state::clock2_w));
 
 	// This is actually a 4013 chip (has 2 RS flipflops)
-	TTL7474(config, m_4013a, 0);
+	TTL7474(config, m_4013a);
 	m_4013a->comp_output_cb().set(m_4013a, FUNC(ttl7474_device::d_w));
 	m_4013a->output_cb().set(m_4020, FUNC(ripple_counter_device::reset_w));
 
-	TTL7474(config, m_4013b, 0);
+	TTL7474(config, m_4013b);
 	m_4013b->output_cb().set(m_maincpu, FUNC(cosmac_device::ef2_w)).invert(); // inverted
 	m_4013b->comp_output_cb().set(m_maincpu, FUNC(cosmac_device::int_w)).invert(); // inverted
 
@@ -596,10 +596,9 @@ void play_3_state::play_3(machine_config &config)
 	m_audiocpu->wait_cb().set_constant(1);
 	m_audiocpu->clear_cb().set(FUNC(play_3_state::clear_a_r));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	AY8910(config, m_ay1, 3.579545_MHz_XTAL / 2).add_route(ALL_OUTPUTS, "lspeaker", 0.75);
-	AY8910(config, m_ay2, 3.579545_MHz_XTAL / 2).add_route(ALL_OUTPUTS, "rspeaker", 0.75);
+	SPEAKER(config, "speaker", 2).front();
+	AY8910(config, m_ay1, 3.579545_MHz_XTAL / 2).add_route(ALL_OUTPUTS, "speaker", 0.75, 0);
+	AY8910(config, m_ay2, 3.579545_MHz_XTAL / 2).add_route(ALL_OUTPUTS, "speaker", 0.75, 1);
 	m_ay1->set_resistors_load(6900, 6900, 6900);
 	m_ay2->set_resistors_load(6900, 6900, 6900);
 	m_ay1->port_a_write_callback().set_nop();
@@ -614,8 +613,7 @@ void play_3_state::spain82(machine_config &config)
 	config.device_remove("audiocpu");
 	config.device_remove("ay1");
 	config.device_remove("ay2");
-	config.device_remove("lspeaker");
-	config.device_remove("rspeaker");
+	config.device_remove("speaker");
 
 	EFO_SOUND3(config, m_sound3);
 }
@@ -640,8 +638,7 @@ void play_3_state::sklflite(machine_config &config)
 	config.device_remove("audiocpu");
 	config.device_remove("ay1");
 	config.device_remove("ay2");
-	config.device_remove("lspeaker");
-	config.device_remove("rspeaker");
+	config.device_remove("speaker");
 
 	EFO_ZSU1(config, m_zsu);
 }

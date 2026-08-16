@@ -61,7 +61,7 @@ protected:
 	uint8_t     m_data;
 	uint8_t     m_duty;
 
-	std::unique_ptr<uint8_t[]>  m_ddr;
+	std::unique_ptr<uint8_t[]> m_ddr;
 };
 
 
@@ -81,6 +81,8 @@ public:
 	// device interface
 	virtual void control_write(uint8_t data) override;
 	uint32_t screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
+
+	std::tuple<bool, bool, uint8_t *, uint8_t, uint8_t, uint8_t> render();
 
 protected:
 	// device-level overrides

@@ -45,7 +45,7 @@ protected:
 	virtual void device_clock_changed() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	// device_memory_interface configuration
 	virtual space_config_vector memory_space_config() const override;
@@ -84,7 +84,7 @@ private:
 class rf5c164_device : public rf5c68_device
 {
 public:
-	rf5c164_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock);
+	rf5c164_device(const machine_config &mconfig, const char *tag, device_t *owner, u32 clock = 0);
 
 	void rf5c164_map(address_map &map) ATTR_COLD;
 };

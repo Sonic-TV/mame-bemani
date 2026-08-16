@@ -11,6 +11,8 @@
 
 #include "emu.h"
 
+#include "psxcd.h"
+
 #include "bus/psx/ctlrport.h"
 #include "bus/psx/parallel.h"
 #include "bus/rs232/rs232.h"
@@ -18,7 +20,6 @@
 #include "cpu/psx/psx.h"
 #include "imagedev/cdromimg.h"
 #include "imagedev/snapquik.h"
-#include "psxcd.h"
 #include "machine/ram.h"
 #include "sound/spu.h"
 #include "video/psx.h"
@@ -28,6 +29,7 @@
 #include "softlist.h"
 #include "speaker.h"
 
+#include "endianness.h"
 #include "multibyte.h"
 
 #include <zlib.h>
@@ -505,7 +507,7 @@ void psx1_state::psx_base(machine_config &config)
 	m_maincpu->cd_write().set(m_psxcd, FUNC(psxcd_device::write));
 	m_maincpu->subdevice<ram_device>("ram")->set_default_size("2M");
 
-	psxcontrollerports_device &controllers(PSXCONTROLLERPORTS(config, "controllers", 0));
+	psxcontrollerports_device &controllers(PSXCONTROLLERPORTS(config, "controllers"));
 	controllers.rxd().set("maincpu:sio0", FUNC(psxsio0_device::write_rxd));
 	controllers.dsr().set("maincpu:sio0", FUNC(psxsio0_device::write_dsr));
 	PSX_CONTROLLER_PORT(config, "port1", psx_controllers, "digital_pad");
@@ -523,14 +525,13 @@ void psx1_state::psx_base(machine_config &config)
 	sio1.txd_handler().set(rs232, FUNC(rs232_port_device::write_txd));
 	sio1.dtr_handler().set(rs232, FUNC(rs232_port_device::write_dtr));
 
-	SCREEN(config, "screen", SCREEN_TYPE_RASTER);
+	SCREEN(config, "screen");
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	spu_device &spu(SPU(config, "spu", XTAL(67'737'600)/2, m_maincpu.target()));
-	spu.add_route(0, "lspeaker", 1.00);
-	spu.add_route(1, "rspeaker", 1.00);
+	spu.add_route(0, "speaker", 1.00, 0);
+	spu.add_route(1, "speaker", 1.00, 1);
 
 	QUICKLOAD(config, "quickload", "cpe,exe,psf,psx").set_load_callback(FUNC(psx1_state::quickload_exe));
 

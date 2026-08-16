@@ -137,16 +137,14 @@ static DEVICE_INPUT_DEFAULTS_START( host_rs232_defaults )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
-	DEVICE_INPUT_DEFAULTS( "FLOW_CONTROL", 0x01, 0x01 )
+	DEVICE_INPUT_DEFAULTS( "FLOW_CONTROL", 0x07, 0x01 )
 DEVICE_INPUT_DEFAULTS_END
 
 static DEVICE_INPUT_DEFAULTS_START( kbd_rs232_defaults )
 	DEVICE_INPUT_DEFAULTS( "RS232_TXBAUD", 0xff, RS232_BAUD_19200 )
-	DEVICE_INPUT_DEFAULTS( "RS232_RXBAUD", 0xff, RS232_BAUD_19200 )
 	DEVICE_INPUT_DEFAULTS( "RS232_DATABITS", 0xff, RS232_DATABITS_8 )
 	DEVICE_INPUT_DEFAULTS( "RS232_PARITY", 0xff, RS232_PARITY_NONE )
 	DEVICE_INPUT_DEFAULTS( "RS232_STOPBITS", 0xff, RS232_STOPBITS_2 )
-	DEVICE_INPUT_DEFAULTS( "FLOW_CONTROL", 0x01, 0x01 )
 DEVICE_INPUT_DEFAULTS_END
 
 
@@ -237,7 +235,7 @@ void blit_state::blit(machine_config &config)
 	M68000(config, m_maincpu, XTAL(33'000'000) / 4); // maybe XTAL(32'760'000)
 	m_maincpu->set_addrmap(AS_PROGRAM, &blit_state::blit_mem);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD, rgb_t::white());
+	SCREEN(config, m_screen).set_lcd().set_color(rgb_t::white());
 	m_screen->set_refresh_hz(60);
 	m_screen->set_size(800, 1024);
 	m_screen->set_visarea(0, 800-1, 0, 1024-1);
@@ -249,7 +247,7 @@ void blit_state::blit(machine_config &config)
 
 	CLOCK(config, "system_clock", 19200 * 16).signal_handler().set(FUNC(blit_state::system_clock_write));
 
-	ACIA6850(config, m_acia0, 0);
+	ACIA6850(config, m_acia0);
 	m_acia0->txd_handler().set(RS232_H_TAG, FUNC(rs232_port_device::write_txd));
 	m_acia0->rts_handler().set(RS232_H_TAG, FUNC(rs232_port_device::write_rts));
 	m_acia0->irq_handler().set_inputline(M68K_TAG, M68K_IRQ_5);
@@ -260,7 +258,7 @@ void blit_state::blit(machine_config &config)
 	rs232h.cts_handler().set(m_acia0, FUNC(acia6850_device::write_cts));
 	rs232h.set_option_device_input_defaults("null_modem", DEVICE_INPUT_DEFAULTS_NAME(host_rs232_defaults));
 
-	ACIA6850(config, m_acia1, 0);
+	ACIA6850(config, m_acia1);
 	m_acia1->txd_handler().set(RS232_K_TAG, FUNC(rs232_port_device::write_txd));
 	m_acia1->rts_handler().set(RS232_K_TAG, FUNC(rs232_port_device::write_rts));
 	m_acia1->irq_handler().set_inputline(M68K_TAG, M68K_IRQ_2);

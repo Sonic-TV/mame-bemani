@@ -233,6 +233,8 @@ Notes:
 
 #include "cdrom.h"
 
+#include <sstream>
+
 
 namespace {
 
@@ -1124,8 +1126,8 @@ INPUT_PORTS_END
 
 void konamim2_state::cr589_config(device_t *device)
 {
-	device->subdevice<cdda_device>("cdda")->add_route(0, ":lspeaker", 0.5);
-	device->subdevice<cdda_device>("cdda")->add_route(1, ":rspeaker", 0.5);
+	device->subdevice<cdda_device>("cdda")->add_route(0, ":speaker", 0.5, 0);
+	device->subdevice<cdda_device>("cdda")->add_route(1, ":speaker", 0.5, 1);
 	device = device->subdevice("cdda");
 }
 
@@ -1158,7 +1160,7 @@ void konamim2_state::konamim2(machine_config &config)
 	// Common devices
 	EEPROM_93C46_16BIT(config, m_eeprom);
 
-	ATA_INTERFACE(config, m_ata, 0);
+	ATA_INTERFACE(config, m_ata);
 	m_ata->irq_handler().set(FUNC(konamim2_state::ata_int));
 
 	m_ata->slot(0).option_add("cr589", CR589);
@@ -1166,16 +1168,15 @@ void konamim2_state::konamim2(machine_config &config)
 	m_ata->slot(0).set_default_option("cr589");
 
 	// Video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_screen_update("bda:vdu", FUNC(m2_vdu_device::screen_update));
 
 	// Sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	// TODO!
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 }
 
 
@@ -1211,8 +1212,8 @@ void konamim2_state::add_ymz280b(machine_config &config)
 {
 	// TODO: The YMZ280B outputs are actually routed to a speaker in each gun
 	YMZ280B(config, m_ymz280b, XTAL(16'934'400));
-	m_ymz280b->add_route(0, "lspeaker", 0.5);
-	m_ymz280b->add_route(1, "rspeaker", 0.5);
+	m_ymz280b->add_route(0, "speaker", 0.5, 0);
+	m_ymz280b->add_route(1, "speaker", 0.5, 1);
 }
 
 void konamim2_state::add_mt48t58(machine_config &config)
@@ -1501,11 +1502,19 @@ void konamim2_state::debug_commands(const std::vector<std::string_view> &params)
 		return;
 
 	if (params[0] == "help")
+	{
 		debug_help_command(params);
+	}
 	else if (params[0] == "dump_task")
+	{
 		dump_task_command(params);
+	}
 	else if (params[0] == "dump_dspp")
-		subdevice<dspp_device>("bda:dspp")->dump_state();
+	{
+		std::ostringstream str;
+		subdevice<dspp_device>("bda:dspp")->dump_state(str);
+		machine().debugger().console().printf("%s", std::move(str).str());
+	}
 }
 
 void konamim2_state::dump_task_command(const std::vector<std::string_view> &params)

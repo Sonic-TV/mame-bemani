@@ -563,7 +563,7 @@ void inufuku_state::inufuku(machine_config &config)
 	EEPROM_93C46_16BIT(config, "eeprom");
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2300));
 	screen.set_size(2048, 256);
@@ -572,7 +572,7 @@ void inufuku_state::inufuku(machine_config &config)
 	screen.screen_vblank().set(m_sprattrram, FUNC(buffered_spriteram16_device::vblank_copy_rising));
 	screen.set_palette(m_palette);
 
-	VSYSTEM_SPR(config, m_spr, 0, m_palette, gfx_inufuku_spr);
+	VSYSTEM_SPR(config, m_spr, m_palette, gfx_inufuku_spr);
 	m_spr->set_offsets(0, 1); // reference videos confirm at least the +1 against tilemaps in 3on3dunk (the highscore header text and black box are meant to be 1 pixel misaligned, although there is currently a priority bug there too)
 	m_spr->set_tile_indirect_cb(FUNC(inufuku_state::tile_callback));
 	m_spr->set_pri_cb(FUNC(inufuku_state::pri_callback));
@@ -592,8 +592,8 @@ void inufuku_state::inufuku(machine_config &config)
 	ym2610_device &ymsnd(YM2610(config, "ymsnd", XTAL(32'000'000)/4));
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
 	ymsnd.add_route(0, "mono", 0.50);
-	ymsnd.add_route(1, "mono", 0.75);
-	ymsnd.add_route(2, "mono", 0.75);
+	ymsnd.add_route(1, "mono", 0.25);
+	ymsnd.add_route(2, "mono", 0.25);
 }
 
 

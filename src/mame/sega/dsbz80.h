@@ -20,7 +20,7 @@ class dsbz80_device : public device_t, public device_sound_interface
 {
 public:
 	// construction/destruction
-	dsbz80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	dsbz80_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// configuration
 	auto rxd_handler() { return m_rxd_handler.bind(); }
@@ -35,7 +35,7 @@ protected:
 	virtual void device_add_mconfig(machine_config &config) override ATTR_COLD;
 
 	// device_sound_interface implementation
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	required_device<cpu_device> m_ourcpu;

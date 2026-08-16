@@ -20,12 +20,12 @@ DEFINE_DEVICE_TYPE(GEW12, gew12_device, "gew12", "Yamaha YMW728-F (GEW12)")
 
 gew12_device::gew12_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: m6502_mcu_device_base<w65c02_device>(mconfig, GEW12, tag, owner, clock)
-	, device_mixer_interface(mconfig, *this, 2)
+	, device_mixer_interface(mconfig, *this)
 	, m_in_cb(*this, 0xff), m_out_cb(*this)
 	, m_rom(*this, DEVICE_SELF)
 	, m_bank(*this, "bank%u", 0U)
 {
-	program_config.m_internal_map = address_map_constructor(FUNC(gew12_device::internal_map), this);
+	m_program_config.m_internal_map = address_map_constructor(FUNC(gew12_device::internal_map), this);
 }
 
 

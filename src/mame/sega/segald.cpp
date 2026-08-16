@@ -382,10 +382,10 @@ void segald_state::astron(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &segald_state::mainport);
 	m_maincpu->set_periodic_int(FUNC(segald_state::nmi_line_pulse), attotime::from_hz(1000.0/59.94));
 
-	PIONEER_LDV1000(config, m_laserdisc, 0);
+	PIONEER_LDV1000(config, m_laserdisc);
 	m_laserdisc->set_overlay(256, 256, FUNC(segald_state::screen_update_astron));
-	m_laserdisc->add_route(0, "lspeaker", 1.0);
-	m_laserdisc->add_route(1, "rspeaker", 1.0);
+	m_laserdisc->add_route(0, "speaker", 1.0, 0);
+	m_laserdisc->add_route(1, "speaker", 1.0, 1);
 
 	/* video hardware */
 	m_laserdisc->add_ntsc_screen(config, "screen");
@@ -394,8 +394,7 @@ void segald_state::astron(machine_config &config)
 	PALETTE(config, m_palette).set_entries(256);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 }
 
 

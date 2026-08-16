@@ -58,7 +58,8 @@ void wozfdc_device::device_add_mconfig(machine_config &config)
 
 wozfdc_device::wozfdc_device(const machine_config &mconfig, device_type type, const char *tag, device_t *owner, uint32_t clock) :
 	device_t(mconfig, type, tag, owner, clock),
-		m_phaselatch(*this, "phaselatch")
+	m_rom_p6(*this, DISKII_P6_REGION),
+	m_phaselatch(*this, "phaselatch")
 {
 }
 
@@ -78,8 +79,6 @@ appleiii_fdc_device::appleiii_fdc_device(const machine_config &mconfig, const ch
 
 void wozfdc_device::device_start()
 {
-	m_rom_p6 = machine().root_device().memregion(this->subtag(DISKII_P6_REGION).c_str())->base();
-
 	timer = timer_alloc(FUNC(wozfdc_device::generic_tick), this);
 	delay_timer = timer_alloc(FUNC(wozfdc_device::delayed_tick), this);
 
@@ -203,10 +202,16 @@ TIMER_CALLBACK_MEMBER(wozfdc_device::delayed_tick)
 
 uint8_t wozfdc_device::read(offs_t offset)
 {
+	if (machine().side_effects_disabled())
+		return (offset & 1) ? 0xff : data_reg;
+
 	lss_sync();
 	control(offset);
 
 	if(!(offset & 1)) {
+		// The FDC runs faster than the CPU, so it has time to run
+		// for one cycle before the CPU can observe the data register.
+		lss_sync(1);
 		return data_reg;
 	}
 	return 0xff;
@@ -352,14 +357,13 @@ void wozfdc_device::lss_start()
 		floppy->set_write_splice(write_start_time);
 }
 
-void wozfdc_device::lss_sync()
+void wozfdc_device::lss_sync(uint64_t extra_cycles)
 {
 	if(!active)
 		return;
 
 	attotime next_flux = floppy ? floppy->get_next_transition(cycles_to_time(cycles-1)) : attotime::never;
 
-	uint64_t cycles_limit = time_to_cycles(machine().time());
 	uint64_t cycles_next_flux = next_flux != attotime::never ? time_to_cycles(next_flux) : uint64_t(-1);
 	uint64_t cycles_next_flux_down = cycles_next_flux != uint64_t(-1) ? cycles_next_flux+1 : uint64_t(-1);
 
@@ -367,6 +371,9 @@ void wozfdc_device::lss_sync()
 		address &= ~0x10;
 	else
 		address |= 0x10;
+
+	uint64_t cycles_limit = time_to_cycles(machine().time()) + extra_cycles;
+	assert(cycles <= cycles_limit); // make sure we aren't going back in time
 
 	while(cycles < cycles_limit) {
 		uint64_t cycles_next_trans = cycles_limit;

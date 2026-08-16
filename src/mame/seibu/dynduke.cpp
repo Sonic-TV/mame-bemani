@@ -65,6 +65,8 @@
 
 #include "emu.h"
 
+#include "sei80bu.h"
+
 #include "seibusound.h"
 
 #include "cpu/nec/nec.h"
@@ -145,7 +147,9 @@ private:
 	void draw_sprites(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect);
 	void draw_background(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect, int pri, uint32_t pri_mask);
 
+	IRQ_CALLBACK_MEMBER( vector_r );
 	void vblank_irq(int state);
+
 	void master_map(address_map &map) ATTR_COLD;
 	void masterj_map(address_map &map) ATTR_COLD;
 	void sei80bu_encrypted_full_map(address_map &map) ATTR_COLD;
@@ -437,7 +441,7 @@ void dynduke_state::sound_map(address_map &map)
 	map(0x4008, 0x4009).rw(m_seibu_sound, FUNC(seibu_sound_device::ym_r), FUNC(seibu_sound_device::ym_w));
 	map(0x4010, 0x4011).r(m_seibu_sound, FUNC(seibu_sound_device::soundlatch_r));
 	map(0x4012, 0x4012).r(m_seibu_sound, FUNC(seibu_sound_device::main_data_pending_r));
-	map(0x4013, 0x4013).portr("COIN");
+	map(0x4013, 0x4013).r(m_seibu_sound, FUNC(seibu_sound_device::coin_r));
 	map(0x4018, 0x4019).w(m_seibu_sound, FUNC(seibu_sound_device::main_data_w));
 	map(0x401b, 0x401b).w(m_seibu_sound, FUNC(seibu_sound_device::coin_w));
 	map(0x6000, 0x6000).rw("oki", FUNC(okim6295_device::read), FUNC(okim6295_device::write));
@@ -451,7 +455,7 @@ void dynduke_state::sound_decrypted_opcodes_map(address_map &map)
 void dynduke_state::sei80bu_encrypted_full_map(address_map &map)
 {
 	map(0x0000, 0x7fff).rom().region("audiocpu", 0);
-	map(0x8000, 0xffff).bankr("seibu_bank1");
+	map(0x8000, 0xffff).bankr("seibu_bank");
 }
 
 
@@ -612,15 +616,20 @@ GFXDECODE_END
 
 // Interrupt Generator
 
+IRQ_CALLBACK_MEMBER(dynduke_state::vector_r)
+{
+	// both CPUs points at the same vector
+	return 0xc8 / 4;
+}
+
 void dynduke_state::vblank_irq(int state)
 {
 	if (state)
 	{
-		m_maincpu->set_input_line_and_vector(0, HOLD_LINE, 0xc8 / 4); // V30
-		m_slave->set_input_line_and_vector(0, HOLD_LINE, 0xc8 / 4); // V30
+		m_maincpu->set_input_line(0, HOLD_LINE);
+		m_slave->set_input_line(0, HOLD_LINE);
 	}
 }
-
 
 // Machine Driver
 
@@ -629,16 +638,18 @@ void dynduke_state::dynduke(machine_config &config)
 	// basic machine hardware
 	V30(config, m_maincpu, 16_MHz_XTAL / 2); // NEC V30-8 CPU
 	m_maincpu->set_addrmap(AS_PROGRAM, &dynduke_state::master_map);
+	m_maincpu->set_irq_acknowledge_callback(FUNC(dynduke_state::vector_r));
 
 	V30(config, m_slave, 16_MHz_XTAL / 2); // NEC V30-8 CPU
 	m_slave->set_addrmap(AS_PROGRAM, &dynduke_state::slave_map);
+	m_slave->set_irq_acknowledge_callback(FUNC(dynduke_state::vector_r));
 
 	z80_device &audiocpu(Z80(config, "audiocpu", 14.318181_MHz_XTAL / 4));
 	audiocpu.set_addrmap(AS_PROGRAM, &dynduke_state::sound_map);
 	audiocpu.set_addrmap(AS_OPCODES, &dynduke_state::sound_decrypted_opcodes_map);
 	audiocpu.set_irq_acknowledge_callback("seibu_sound", FUNC(seibu_sound_device::im0_vector_cb));
 
-	sei80bu_device &sei80bu(SEI80BU(config, "sei80bu", 0));
+	sei80bu_device &sei80bu(SEI80BU(config, "sei80bu", 14.318181_MHz_XTAL / 4));
 	sei80bu.set_addrmap(AS_PROGRAM, &dynduke_state::sei80bu_encrypted_full_map);
 
 	config.set_maximum_quantum(attotime::from_hz(3600));
@@ -646,7 +657,7 @@ void dynduke_state::dynduke(machine_config &config)
 	// video hardware
 	BUFFERED_SPRITERAM16(config, m_spriteram);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(32*8, 32*8);
@@ -669,10 +680,11 @@ void dynduke_state::dynduke(machine_config &config)
 	okim6295_device &oki(OKIM6295(config, "oki", 12_MHz_XTAL / 12, okim6295_device::PIN7_HIGH));
 	oki.add_route(ALL_OUTPUTS, "mono", 0.40);
 
-	SEIBU_SOUND(config, m_seibu_sound, 0);
+	SEIBU_SOUND(config, m_seibu_sound);
 	m_seibu_sound->int_callback().set_inputline("audiocpu", 0);
+	m_seibu_sound->coin_io_callback().set_ioport("COIN");
 	m_seibu_sound->set_rom_tag("audiocpu");
-	m_seibu_sound->set_rombank_tag("seibu_bank1");
+	m_seibu_sound->set_rombank_tag("seibu_bank");
 	m_seibu_sound->ym_read_callback().set("ymsnd", FUNC(ym3812_device::read));
 	m_seibu_sound->ym_write_callback().set("ymsnd", FUNC(ym3812_device::write));
 }

@@ -256,7 +256,7 @@ void pxa255_periphs_device::device_add_mconfig(machine_config &config)
 {
 	// TODO: should be SCREEN_TYPE_LCD, but that dislikes dynamic configure
 	// will stay stuck at 296x480 aspect ratio.
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(1024, 1024);
@@ -265,11 +265,10 @@ void pxa255_periphs_device::device_add_mconfig(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(256);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	DMADAC(config, m_dmadac[0]).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	DMADAC(config, m_dmadac[1]).add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	DMADAC(config, m_dmadac[0]).add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	DMADAC(config, m_dmadac[1]).add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 }
 
 /*
@@ -1479,7 +1478,7 @@ void pxa255_periphs_device::lcd_lccr_w(offs_t offset, u32 data, u32 mem_mask)
 			if (lpp && ppl)
 			{
 				rectangle rect(0, ppl, 0, lpp);
-				m_screen->configure(1024, 1024, rect, HZ_TO_ATTOSECONDS(60));
+				m_screen->configure(1024, 1024, rect, attotime::from_hz(60));
 			}
 		}
 	}

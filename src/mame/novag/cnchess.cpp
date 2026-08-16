@@ -9,6 +9,10 @@ Novag's first Xiangqi computer, mainly sold in Hong Kong. Model 8710 (棋王, Ch
 King) was distributed by Yorter Electronics for the local market. It's the same
 hardware as model 866. The newer model 9300 is also presumed to be the same.
 
+NOTE: If internal artwork Chinese text is not visible (either fontprovider or OS
+doesn't support character substitution), manually set the -artfont option to a
+CJK font.
+
 Hardware notes:
 - PCB label: 100054
 - Hitachi HD6305Y0P @ ~8MHz (LC oscillator)
@@ -89,15 +93,11 @@ void cnchess_state::machine_start()
 void cnchess_state::init_board(u8 data)
 {
 	// 1st row
-	m_board->write_piece(0, 0, 3);
-	m_board->write_piece(0, 8, 3);
-	m_board->write_piece(0, 1, 4);
-	m_board->write_piece(0, 7, 4);
-	m_board->write_piece(0, 2, 5);
-	m_board->write_piece(0, 6, 5);
-	m_board->write_piece(0, 3, 6);
-	m_board->write_piece(0, 5, 6);
-	m_board->write_piece(0, 4, 7);
+	for (int i = 0; i < 5; i++)
+	{
+		m_board->write_piece(0, i, 3 + i);
+		m_board->write_piece(0, 8 - i, 3 + i);
+	}
 
 	// cannons
 	m_board->write_piece(2, 1, 2);

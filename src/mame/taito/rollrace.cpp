@@ -560,7 +560,7 @@ void rollrace_state::rollace(machine_config &config)
 	mainlatch.q_out_cb<6>().set(FUNC(rollrace_state::spritebank_w));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); // not accurate
 	screen.set_size(256, 256);
@@ -573,14 +573,13 @@ void rollrace_state::rollace(machine_config &config)
 	PALETTE(config, m_palette, FUNC(rollrace_state::palette), 256);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, "soundlatch");
 
-	AY8910(config, "ay1", XTAL(24'000'000) / 16).add_route(ALL_OUTPUTS, "rspeaker", 0.10); // verified on PCB
-	AY8910(config, "ay2", XTAL(24'000'000) / 16).add_route(ALL_OUTPUTS, "rspeaker", 0.10); // verified on PCB
-	AY8910(config, "ay3", XTAL(24'000'000) / 16).add_route(ALL_OUTPUTS, "lspeaker", 0.10); // verified on PCB
+	AY8910(config, "ay1", XTAL(24'000'000) / 16).add_route(ALL_OUTPUTS, "speaker", 0.10, 1); // verified on PCB
+	AY8910(config, "ay2", XTAL(24'000'000) / 16).add_route(ALL_OUTPUTS, "speaker", 0.10, 1); // verified on PCB
+	AY8910(config, "ay3", XTAL(24'000'000) / 16).add_route(ALL_OUTPUTS, "speaker", 0.10, 0); // verified on PCB
 }
 
 void rollrace_state::rollace2(machine_config &config)
@@ -743,7 +742,7 @@ ROM_END
 
 } // anonymous namespace
 
-//    YEAR  NAME      PARENT    MACHINE   INPUT    CLASS          INIT        SCREEN  COMPANY, FULLNAME, FLAGS
-GAME( 1983, fightrol, 0,        rollace,  rollace, rollrace_state, empty_init, ROT270, "Kaneko (Taito license)", "Fighting Roller", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+//    YEAR  NAME      PARENT    MACHINE   INPUT    CLASS           INIT        SCREEN  COMPANY                      FULLNAME               FLAGS
+GAME( 1983, fightrol, 0,        rollace,  rollace, rollrace_state, empty_init, ROT270, "Kaneko (Taito license)",    "Fighting Roller",     MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, rollace,  fightrol, rollace,  rollace, rollrace_state, empty_init, ROT270, "Kaneko (Williams license)", "Roller Aces (set 1)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1983, rollace2, fightrol, rollace2, rollace, rollrace_state, empty_init, ROT90,  "Kaneko (Williams license)", "Roller Aces (set 2)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

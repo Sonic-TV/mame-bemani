@@ -48,6 +48,8 @@
 #include "screen.h"
 #include "speaker.h"
 
+#include "endianness.h"
+
 
 namespace {
 
@@ -542,12 +544,11 @@ void tapatune_state::tapatune_base(machine_config &config)
 	TICKET_DISPENSER(config, "ticket", attotime::from_msec(100));
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	BSMT2000(config, m_bsmt, XTAL(24'000'000));
-	m_bsmt->add_route(0, "lspeaker", 1.0);
-	m_bsmt->add_route(1, "rspeaker", 1.0);
+	m_bsmt->add_route(0, "speaker", 1.0, 0);
+	m_bsmt->add_route(1, "speaker", 1.0, 1);
 }
 
 void tapatune_state::tapatune(machine_config &config)
@@ -568,7 +569,7 @@ void tapatune_state::tapatune(machine_config &config)
 	crtc.out_vsync_callback().set(FUNC(tapatune_state::crtc_vsync));
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(24'000'000) / 16 * 5, 500, 0, 320, 250, 0, 240);
 	screen.set_screen_update("crtc", FUNC(hd6845s_device::screen_update));
 }

@@ -45,7 +45,7 @@ TODO:
 
 Chips:
 MC68000P10
-Goldstar GM68B45S (same as Hitachi HD6845 CTR Controller)*
+Goldstar GM68B45S (same as Hitachi HD6845 CRT Controller)*
 Winbond WF19054 (same as AY3-8910)
 MK28 (appears to be a AD-65, AKA OKI6295) next to rom 10
 Synertek SY6522 VIA
@@ -472,7 +472,7 @@ void bmcbowl_state::bmcbowl(machine_config &config)
 	M68000(config, m_maincpu, 21.477272_MHz_XTAL / 2);
 	m_maincpu->set_addrmap(AS_PROGRAM, &bmcbowl_state::main_mem);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(35*8, 30*8);
@@ -482,27 +482,26 @@ void bmcbowl_state::bmcbowl(machine_config &config)
 	screen.screen_vblank().append("via6522", FUNC(via6522_device::write_cb1));
 
 	PALETTE(config, m_palette).set_entries(256);
-	ramdac_device &ramdac(RAMDAC(config, "ramdac", 0, m_palette));
+	ramdac_device &ramdac(RAMDAC(config, "ramdac", m_palette));
 	ramdac.set_addrmap(0, &bmcbowl_state::ramdac_map);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ym2413_device &ymsnd(YM2413(config, "ymsnd", 3.579545_MHz_XTAL)); // guessed chip type
-	ymsnd.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	ymsnd.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	ymsnd.add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
+	ymsnd.add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 
 	ay8910_device &aysnd(AY8910(config, "aysnd", 21.477272_MHz_XTAL / 16)); // matches PCB recording
 	aysnd.port_a_read_callback().set(FUNC(bmcbowl_state::dips1_r));
 	aysnd.port_b_write_callback().set(FUNC(bmcbowl_state::input_mux_w));
-	aysnd.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	aysnd.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
+	aysnd.add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 
 	okim6295_device &oki(OKIM6295(config, "oki", 21.477272_MHz_XTAL / 16, okim6295_device::PIN7_LOW)); // matches PCB recording
-	oki.add_route(ALL_OUTPUTS, "lspeaker", 0.50);
-	oki.add_route(ALL_OUTPUTS, "rspeaker", 0.50);
+	oki.add_route(ALL_OUTPUTS, "speaker", 0.50, 0);
+	oki.add_route(ALL_OUTPUTS, "speaker", 0.50, 1);
 
 	/* via */
 	via6522_device &via(MOS6522(config, "via6522", 13.3_MHz_XTAL / 16)); // clock not verified (controls music tempo)

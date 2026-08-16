@@ -170,7 +170,7 @@ void fb01_state::fb01(machine_config &config)
 	m_maincpu->set_addrmap(AS_IO, &fb01_state::fb01_io);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(6*16, 9);
@@ -203,12 +203,11 @@ void fb01_state::fb01(machine_config &config)
 
 	MIDI_PORT(config, "mdthru", midiout_slot, "midiout");
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 	ym2164_device &ym2164(YM2164(config, "ym2164", XTAL(4'000'000)));
 	ym2164.irq_handler().set(FUNC(fb01_state::ym2164_irq_w));
-	ym2164.add_route(0, "lspeaker", 1.00);
-	ym2164.add_route(1, "rspeaker", 1.00);
+	ym2164.add_route(0, "speaker", 1.00, 0);
+	ym2164.add_route(1, "speaker", 1.00, 1);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 }

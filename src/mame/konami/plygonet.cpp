@@ -68,9 +68,9 @@
 #include "cpu/m68000/m68020.h"
 #include "cpu/z80/z80.h"
 #include "machine/eepromser.h"
-#include "machine/k054321.h"
 #include "machine/k056230.h"
 #include "machine/watchdog.h"
+#include "sound/k054321.h"
 #include "sound/k054539.h"
 #include "video/k053936.h"
 
@@ -78,6 +78,8 @@
 #include "screen.h"
 #include "speaker.h"
 #include "tilemap.h"
+
+#include "endianness.h"
 
 #define LOG_DSP_AB0         (1U << 1)
 #define LOG_DSP_A6          (1U << 2)
@@ -1062,7 +1064,7 @@ void polygonet_state::plygonet(machine_config &config)
 	m_k056230->irq_cb().set_inputline(m_maincpu, M68K_IRQ_3);
 
 	// Video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
@@ -1073,19 +1075,18 @@ void polygonet_state::plygonet(machine_config &config)
 
 	PALETTE(config, m_palette).set_format(palette_device::xRGB_888, 32768);
 
-	K053936(config, m_k053936, 0);
+	K053936(config, m_k053936);
 	m_k053936->set_wrap(true);
 
 	// Sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	K054321(config, m_k054321, "lspeaker", "rspeaker");
+	K054321(config, m_k054321, "speaker");
 
 	k054539_device &k054539(K054539(config, "k054539", XTAL(18'432'000)));
 	k054539.timer_handler().set(FUNC(polygonet_state::k054539_nmi_gen));
-	k054539.add_route(0, "lspeaker", 0.75);
-	k054539.add_route(1, "rspeaker", 0.75);
+	k054539.add_route(0, "speaker", 0.75, 0);
+	k054539.add_route(1, "speaker", 0.75, 1);
 }
 
 

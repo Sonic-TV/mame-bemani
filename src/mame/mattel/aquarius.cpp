@@ -411,7 +411,6 @@ GFXDECODE_END
 
 static DEVICE_INPUT_DEFAULTS_START(printer)
 	DEVICE_INPUT_DEFAULTS("RS232_RXBAUD", 0xff, RS232_BAUD_1200)
-	DEVICE_INPUT_DEFAULTS("RS232_TXBAUD", 0xff, RS232_BAUD_1200)
 	DEVICE_INPUT_DEFAULTS("RS232_DATABITS", 0xff, RS232_DATABITS_8)
 	DEVICE_INPUT_DEFAULTS("RS232_PARITY", 0xff, RS232_PARITY_NONE)
 	DEVICE_INPUT_DEFAULTS("RS232_STOPBITS", 0xff, RS232_STOPBITS_2)
@@ -432,7 +431,7 @@ void aquarius_state::aquarius(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &aquarius_state::aquarius_mem);
 	m_maincpu->set_addrmap(AS_IO, &aquarius_state::aquarius_io);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(7.15909_MHz_XTAL, 458, 0, 352, 262, 0, 232);
 	m_screen->set_screen_update(FUNC(aquarius_state::screen_update_aquarius));
 	m_screen->set_video_attributes(VIDEO_UPDATE_SCANLINE);

@@ -483,7 +483,7 @@ void subs_state::subs(machine_config &config)
 
 	config.set_default_layout(layout_dualhsxs);
 
-	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER));
+	screen_device &lscreen(SCREEN(config, "lscreen"));
 	lscreen.set_refresh_hz(57);
 	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); //not accurate
 	lscreen.set_size(32*8, 32*8);
@@ -491,7 +491,7 @@ void subs_state::subs(machine_config &config)
 	lscreen.set_screen_update(FUNC(subs_state::screen_update<0>));
 	lscreen.set_palette(m_palette);
 
-	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER));
+	screen_device &rscreen(SCREEN(config, "rscreen"));
 	rscreen.set_refresh_hz(57);
 	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); //not accurate
 	rscreen.set_size(32*8, 32*8);
@@ -501,10 +501,9 @@ void subs_state::subs(machine_config &config)
 
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	DISCRETE(config, m_discrete, subs_discrete).add_route(0, "lspeaker", 1.0).add_route(1, "rspeaker", 1.0);
+	DISCRETE(config, m_discrete, subs_discrete).add_route(0, "speaker", 1.0, 0).add_route(1, "speaker", 1.0, 1);
 
 	ls259_device &latch(LS259(config, "latch")); // C9
 	latch.q_out_cb<0>().set_output("led0").invert(); // START LAMP 1

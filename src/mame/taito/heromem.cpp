@@ -223,7 +223,7 @@ void heromem_state::heromem(machine_config &config)
 	TE7751(config, "io");
 
 	// video hardware
-	screen_device &lscreen(SCREEN(config, "lscreen", SCREEN_TYPE_RASTER)); // all wrong
+	screen_device &lscreen(SCREEN(config, "lscreen")); // all wrong
 	lscreen.set_refresh_hz(60);
 	lscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	lscreen.set_size(64*8, 32*8);
@@ -232,7 +232,7 @@ void heromem_state::heromem(machine_config &config)
 	lscreen.screen_vblank().set(FUNC(heromem_state::screen_vblank_l));
 	lscreen.set_palette("tc0091lvc_l:palette");
 
-	screen_device &rscreen(SCREEN(config, "rscreen", SCREEN_TYPE_RASTER)); // all wrong
+	screen_device &rscreen(SCREEN(config, "rscreen")); // all wrong
 	rscreen.set_refresh_hz(60);
 	rscreen.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	rscreen.set_size(64*8, 32*8);
@@ -241,11 +241,11 @@ void heromem_state::heromem(machine_config &config)
 	rscreen.screen_vblank().set(FUNC(heromem_state::screen_vblank_r));
 	rscreen.set_palette("tc0091lvc_r:palette");
 
-	pc060ha_device &ciu_l(PC060HA(config, "ciu_l", 0));
+	pc060ha_device &ciu_l(PC060HA(config, "ciu_l"));
 	ciu_l.nmi_callback().set_inputline(m_tc0091lvc_l, INPUT_LINE_NMI);
 	ciu_l.reset_callback().set_inputline(m_tc0091lvc_l, INPUT_LINE_RESET);
 
-	pc060ha_device &ciu_r(PC060HA(config, "ciu_r", 0));
+	pc060ha_device &ciu_r(PC060HA(config, "ciu_r"));
 	ciu_r.nmi_callback().set_inputline(m_tc0091lvc_r, INPUT_LINE_NMI);
 	ciu_r.reset_callback().set_inputline(m_tc0091lvc_r, INPUT_LINE_RESET);
 
@@ -256,31 +256,29 @@ void heromem_state::heromem(machine_config &config)
 	vdp_r.set_addrmap(AS_PROGRAM, &heromem_state::tc0091lvc_r_prg_map);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
+	SPEAKER(config, "speaker", 2).front();
 
-	SPEAKER(config, "rspeaker").front_right();
-
-	tc0140syt_device &syt_l(TC0140SYT(config, "tc0140syt_l", 0));
+	tc0140syt_device &syt_l(TC0140SYT(config, "tc0140syt_l"));
 	syt_l.nmi_callback().set_inputline("audiocpu_l", INPUT_LINE_NMI);
 	syt_l.reset_callback().set_inputline("audiocpu_l", INPUT_LINE_RESET);
 
-	tc0140syt_device &syt_r(TC0140SYT(config, "tc0140syt_r", 0));
+	tc0140syt_device &syt_r(TC0140SYT(config, "tc0140syt_r"));
 	syt_r.nmi_callback().set_inputline("audiocpu_r", INPUT_LINE_NMI);
 	syt_r.reset_callback().set_inputline("audiocpu_r", INPUT_LINE_RESET);
 
 	ym2610b_device &ym_l(YM2610B(config, "ym_l", 16000000 / 2));
 	ym_l.irq_handler().set_inputline("audiocpu_l", 0);
-	ym_l.add_route(0, "lspeaker", 0.25);
-	ym_l.add_route(0, "lspeaker", 0.25);
-	ym_l.add_route(1, "lspeaker", 1.0);
-	ym_l.add_route(2, "lspeaker", 1.0);
+	ym_l.add_route(0, "speaker", 0.75, 0);
+	ym_l.add_route(0, "speaker", 0.75, 0);
+	ym_l.add_route(1, "speaker", 1.0, 0);
+	ym_l.add_route(2, "speaker", 1.0, 0);
 
 	ym2610b_device &ym_r(YM2610B(config, "ym_r", 16000000 / 2));
 	ym_r.irq_handler().set_inputline("audiocpu_r", 0);
-	ym_r.add_route(0, "rspeaker", 0.25);
-	ym_r.add_route(0, "rspeaker", 0.25);
-	ym_r.add_route(1, "rspeaker", 1.0);
-	ym_r.add_route(2, "rspeaker", 1.0);
+	ym_r.add_route(0, "speaker", 0.75, 1);
+	ym_r.add_route(0, "speaker", 0.75, 1);
+	ym_r.add_route(1, "speaker", 1.0, 1);
+	ym_r.add_route(2, "speaker", 1.0, 1);
 }
 
 

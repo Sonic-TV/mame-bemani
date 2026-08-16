@@ -185,8 +185,8 @@ TODO:
 #include "machine/6850acia.h"
 #include "machine/meters.h"
 #include "machine/nvram.h"
-#include "machine/roc10937.h"
 #include "machine/steppers.h"
+#include "video/roc10937.h"
 
 #include "sound/ay8910.h"
 #include "sound/okim6376.h"
@@ -198,6 +198,8 @@ TODO:
 #include "emupal.h"
 #include "screen.h"
 #include "speaker.h"
+
+#include "endianness.h"
 
 #include "crmaze2p.lh"
 #include "crmaze4p.lh"
@@ -612,7 +614,7 @@ INPUT_PORTS_START( mpu4vid )
 	PORT_BIT(0x10, IP_ACTIVE_HIGH, IPT_OTHER)   PORT_NAME("20")
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Test Button") PORT_CODE(KEYCODE_W)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_INTERLOCK) PORT_NAME("Cashbox (Back) Door")  PORT_CODE(KEYCODE_Q) PORT_TOGGLE
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_DOOR)    PORT_NAME("Cashbox (Back) Door") PORT_CODE(KEYCODE_Q) PORT_TOGGLE
 
 	PORT_START("BLACK2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("24")
@@ -931,7 +933,7 @@ static INPUT_PORTS_START( bwbvid )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_CUSTOM)  // Prize Shelf Opto
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Test Button") PORT_CODE(KEYCODE_W)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_INTERLOCK) PORT_NAME("Cashbox (Back) Door")  PORT_CODE(KEYCODE_Q) PORT_TOGGLE
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_DOOR)    PORT_NAME("Cashbox (Back) Door") PORT_CODE(KEYCODE_Q) PORT_TOGGLE
 
 	PORT_START("BLACK2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_OTHER) PORT_NAME("Button 1")
@@ -1200,7 +1202,7 @@ static INPUT_PORTS_START( v4big40 )
 	PORT_BIT(0x10, IP_ACTIVE_LOW,  IPT_CUSTOM)  // Prize Shelf Opto
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Test Button") PORT_CODE(KEYCODE_W)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_INTERLOCK) PORT_NAME("Cashbox (Back) Door")  PORT_CODE(KEYCODE_Q) PORT_TOGGLE
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_DOOR) PORT_NAME("Cashbox (Back) Door") PORT_CODE(KEYCODE_Q) PORT_TOGGLE
 
 	PORT_MODIFY("BLACK2")
 	PORT_BIT(0x01, IP_ACTIVE_HIGH, IPT_BUTTON1) PORT_NAME("Cancel/Collect")
@@ -1799,7 +1801,7 @@ static INPUT_PORTS_START( v4timebn )
 	PORT_BIT(0x10, IP_ACTIVE_LOW, IPT_CUSTOM)  // Prize Shelf Opto
 	PORT_BIT(0x20, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Test Button") PORT_CODE(KEYCODE_W)
 	PORT_BIT(0x40, IP_ACTIVE_HIGH, IPT_SERVICE) PORT_NAME("Refill Key") PORT_CODE(KEYCODE_R) PORT_TOGGLE
-	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_INTERLOCK) PORT_NAME("Cashbox (Back) Door")  PORT_CODE(KEYCODE_Q) PORT_TOGGLE
+	PORT_BIT(0x80, IP_ACTIVE_HIGH, IPT_DOOR) PORT_NAME("Cashbox (Back) Door") PORT_CODE(KEYCODE_Q) PORT_TOGGLE
 
 	PORT_MODIFY("BLACK2")
 	PORT_BIT( 0x01, IP_ACTIVE_HIGH, IPT_BUTTON1 ) PORT_NAME("Collect")
@@ -2086,15 +2088,15 @@ void mpu4vid_state::mpu4_vid(machine_config &config)
 	AY8913(config, m_ay8913, MPU4_MASTER_CLOCK/4);
 	m_ay8913->set_flags(AY8910_SINGLE_OUTPUT);
 	m_ay8913->set_resistors_load(820, 0, 0);
-	m_ay8913->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_ay8913->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_ay8913->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	m_ay8913->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);               /* confirm */
 
 	mpu4_common(config);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(VIDEO_MASTER_CLOCK, (63*8)+(17*8), 0, (63*8), (37*8)+17, 0, (37*8));
 	// note this directly affects the scanline counters used below, and thus the timing of everything
 	screen.set_screen_update("scn2674_vid", FUNC(scn2674_device::screen_update));
@@ -2124,20 +2126,19 @@ void mpu4vid_state::mpu4_vid(machine_config &config)
 	m_ptm->o3_callback().set(FUNC(mpu4vid_state::vid_o3_callback));
 	m_ptm->irq_callback().set(FUNC(mpu4vid_state::cpu1_ptm_irq));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	/* Present on all video cards */
 	saa1099_device &saa(SAA1099(config, "saa", 8000000));
-	saa.add_route(0, "lspeaker", 0.5);
-	saa.add_route(1, "rspeaker", 0.5);
+	saa.add_route(0, "speaker", 0.5, 0);
+	saa.add_route(1, "speaker", 0.5, 1);
 
-	ACIA6850(config, m_acia_0, 0);
+	ACIA6850(config, m_acia_0);
 	m_acia_0->txd_handler().set("acia6850_1", FUNC(acia6850_device::write_rxd));
 	m_acia_0->rts_handler().set("acia6850_1", FUNC(acia6850_device::write_dcd));
 	m_acia_0->irq_handler().set(FUNC(mpu4vid_state::m6809_acia_irq));
 
-	ACIA6850(config, m_acia_1, 0);
+	ACIA6850(config, m_acia_1);
 	m_acia_1->txd_handler().set("acia6850_0", FUNC(acia6850_device::write_rxd));
 	m_acia_1->rts_handler().set("acia6850_0", FUNC(acia6850_device::write_dcd));
 	m_acia_1->irq_handler().set(FUNC(mpu4vid_state::m68k_acia_irq));
@@ -2146,7 +2147,7 @@ void mpu4vid_state::mpu4_vid(machine_config &config)
 void mpu4vid_state::mpu4_vid_cheatchr(machine_config &config)
 {
 	mpu4_vid(config);
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser);
 	m_characteriser->set_cpu_tag("video");
 	m_characteriser->set_allow_68k_cheat(true);
 }
@@ -2156,7 +2157,7 @@ void mpu4vid_state::mpu4_vid_strike(machine_config& config)
 	mpu4_vid(config);
 	m_videocpu->set_addrmap(AS_PROGRAM, &mpu4vid_state::mpu4_68k_map_strike);
 
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser);
 	m_characteriser->set_use_4k_table_sim(true);
 }
 
@@ -2175,7 +2176,7 @@ void mpu4vid_state::crmaze_base(machine_config &config)
 void mpu4vid_state::crmaze(machine_config& config)
 {
 	crmaze_base(config);
-	MPU4_CHARACTERISER_PAL(config, m_characteriser, 0);
+	MPU4_CHARACTERISER_PAL(config, m_characteriser);
 	m_characteriser->set_cpu_tag("video");
 	m_characteriser->set_allow_68k_cheat(true);
 
@@ -2187,8 +2188,8 @@ void mpu4vid_state::vid_oki(machine_config &config)
 	//and all samples are adjusted to fit the different clock speed.
 
 	MPU4_OKI_SAMPLED_SOUND(config, m_okicard, VIDEO_MASTER_CLOCK/10);
-	m_okicard->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_okicard->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_okicard->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	m_okicard->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	m_okicard->cb2_handler().set(FUNC(mpu4vid_state::pia_gb_cb2_w));
 
@@ -2344,7 +2345,7 @@ void mpu4vid_state::hack_bwb_startup_protection()
 	// there's no checksum that we need to fix after this
 	// so we can't be sure there are no bad dumps?
 
-	uint16_t *rom = (uint16_t*)memregion("video")->base();
+	uint16_t *rom = &memregion("video")->as_u16();
 	int len = memregion("video")->bytes()/2;
 
 	uint16_t sequence[8] = { 0x3428, 0x0002, 0xb428, 0x0002, 0x671a, 0x2cbc, 0x0002, 0x4001 };
@@ -2468,7 +2469,7 @@ void mpu4vid_state::init_cybcas()
 	hack_bwb_startup_protection();
 
 	// hack out half the startup checks for now until we work out what they're checking!
-	uint16_t *rom = (uint16_t*)memregion("video")->base();
+	uint16_t *rom = &memregion("video")->as_u16();
 
 	for (int i = 0x1e42; i < 0x1e74; i += 2)
 		rom[i / 2] = 0x4e71;
@@ -9237,4 +9238,3 @@ GAME(  199?, v4missis,   0,        bwbvid_oki_bt471_german,    v4cybcas,   mpu4v
 GAME(  199?, v4picdil,   0,        bwbvid_oki_bt471_german,    v4cybcas,    mpu4vid_state, init_bwbhack,    ROT0, "BWB (Nova license)","Piccadilly Night (Nova, German) (set 1) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4picdila,  v4picdil, bwbvid_oki_bt471_german,    v4cybcas,    mpu4vid_state, init_bwbhack,    ROT0, "BWB (Nova license)","Piccadilly Night (Nova, German) (set 2) (MPU4 Video)",GAME_FLAGS )
 GAME(  199?, v4picdilz,  v4picdil, bwbvid_oki_bt471_german,    v4cybcas,    mpu4vid_state, init_bwbhack,    ROT0, "BWB (Nova license)","Piccadilly Night (Nova, German) (set 3) (MPU4 Video)",GAME_FLAGS )
-

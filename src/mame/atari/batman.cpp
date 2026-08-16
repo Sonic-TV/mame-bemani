@@ -182,97 +182,113 @@ uint32_t batman_state::screen_update(screen_device &screen, bitmap_ind16 &bitmap
 
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_vad->mob().bitmap();
-	for (const sparse_dirty_rect *rect = m_vad->mob().first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->top(); y <= rect->bottom(); y++)
-		{
-			uint16_t const *const mo = &mobitmap.pix(y);
-			uint16_t *const pf = &bitmap.pix(y);
-			uint8_t const *const pri = &priority_bitmap.pix(y);
-			for (int x = rect->left(); x <= rect->right(); x++)
-				if (mo[x] != 0xffff)
+	m_vad->mob().iterate_dirty_rects(
+			cliprect,
+			[&bitmap, &priority_bitmap, &mobitmap] (rectangle const &rect)
+			{
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
-					/* verified on real hardware:
-
-					    for all MO colors, MO priority 0:
-					        obscured by low fg playfield pens priority 1-3
-					        obscured by high fg playfield pens priority 3 only
-					        obscured by bg playfield priority 3 only
-
-					    for all MO colors, MO priority 1:
-					        obscured by low fg playfield pens priority 2-3
-					        obscured by high fg playfield pens priority 3 only
-					        obscured by bg playfield priority 3 only
-
-					    for all MO colors, MO priority 2-3:
-					        obscured by low fg playfield pens priority 3 only
-					        obscured by high fg playfield pens priority 3 only
-					        obscured by bg playfield priority 3 only
-					*/
-					int const mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
-
-					// upper bit of MO priority signals special rendering and doesn't draw anything
-					if (mopriority & 4)
-						continue;
-
-					// foreground playfield case
-					if (pri[x] & 0x80)
+					uint16_t const *const mo = &mobitmap.pix(y);
+					uint16_t *const pf = &bitmap.pix(y);
+					uint8_t const *const pri = &priority_bitmap.pix(y);
+					for (int x = rect.left(); x <= rect.right(); x++)
 					{
-						int const pfpriority = (pri[x] >> 2) & 3;
+						if (mo[x] != 0xffff)
+						{
+							/* verified on real hardware:
 
-						// playfield priority 3 always wins
-						if (pfpriority == 3)
-							;
+							    for all MO colors, MO priority 0:
+							        obscured by low fg playfield pens priority 1-3
+							        obscured by high fg playfield pens priority 3 only
+							        obscured by bg playfield priority 3 only
 
-						// priority is consistent for upper pens in playfield
-						else if (pf[x] & 0x08)
-							pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
+							    for all MO colors, MO priority 1:
+							        obscured by low fg playfield pens priority 2-3
+							        obscured by high fg playfield pens priority 3 only
+							        obscured by bg playfield priority 3 only
 
-						// otherwise, we need to compare
-						else if (mopriority >= pfpriority)
-							pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
+							    for all MO colors, MO priority 2-3:
+							        obscured by low fg playfield pens priority 3 only
+							        obscured by high fg playfield pens priority 3 only
+							        obscured by bg playfield priority 3 only
+							*/
+							int const mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
+
+							// upper bit of MO priority signals special rendering and doesn't draw anything
+							if (mopriority & 4)
+								continue;
+
+							if (pri[x] & 0x80)
+							{
+								// foreground playfield case
+								int const pfpriority = (pri[x] >> 2) & 3;
+
+								if (pfpriority == 3)
+								{
+									// playfield priority 3 always wins
+								}
+								else if (pf[x] & 0x08)
+								{
+									// priority is consistent for upper pens in playfield
+									pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
+								}
+								else if (mopriority >= pfpriority)
+								{
+									// otherwise, we need to compare
+									pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
+								}
+							}
+							else
+							{
+								// background playfield case
+								int const pfpriority = pri[x] & 3;
+
+								if (pfpriority == 3)
+								{
+									// playfield priority 3 always wins
+								}
+								else
+								{
+									// otherwise, MOs get shown
+									pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
+								}
+							}
+
+							// don't erase yet -- we need to make another pass later
+						}
 					}
-
-					// background playfield case
-					else
-					{
-						int const pfpriority = pri[x] & 3;
-
-						// playfield priority 3 always wins
-						if (pfpriority == 3)
-							;
-
-						// otherwise, MOs get shown
-						else
-							pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
-					}
-
-					// don't erase yet -- we need to make another pass later
 				}
-		}
+			});
 
 	// add the alpha on top
 	m_vad->alpha().draw(screen, bitmap, cliprect, 0, 0);
 
 	// now go back and process the upper bit of MO priority
-	for (const sparse_dirty_rect *rect = m_vad->mob().first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->top(); y <= rect->bottom(); y++)
-		{
-			uint16_t const *const mo = &mobitmap.pix(y);
-			uint16_t *const pf = &bitmap.pix(y);
-			for (int x = rect->left(); x <= rect->right(); x++)
-				if (mo[x] != 0xffff)
+	m_vad->mob().iterate_dirty_rects(
+			cliprect,
+			[this, &bitmap, &mobitmap] (rectangle const &rect)
+			{
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
-					int const mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
-
-					// upper bit of MO priority might mean palette kludges
-					if (mopriority & 4)
+					uint16_t const *const mo = &mobitmap.pix(y);
+					uint16_t *const pf = &bitmap.pix(y);
+					for (int x = rect.left(); x <= rect.right(); x++)
 					{
-						// if bit 2 is set, start setting high palette bits
-						if (mo[x] & 2)
-							m_vad->mob().apply_stain(bitmap, pf, mo, x, y);
+						if (mo[x] != 0xffff)
+						{
+							int const mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
+
+							// upper bit of MO priority might mean palette kludges
+							if (mopriority & 4)
+							{
+								// if bit 2 is set, start setting high palette bits
+								if (mo[x] & 2)
+									m_vad->mob().apply_stain(bitmap, pf, mo, x, y);
+							}
+						}
 					}
 				}
-		}
+			});
 	return 0;
 }
 
@@ -445,7 +461,7 @@ void batman_state::batman(machine_config &config)
 	GFXDECODE(config, "gfxdecode", "palette", gfx_batman);
 	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 2048);
 
-	ATARI_VAD(config, m_vad, 0, m_screen);
+	ATARI_VAD(config, m_vad, m_screen);
 	m_vad->scanline_int_cb().set_inputline(m_maincpu, M68K_IRQ_4);
 	m_vad->set_xoffsets(2, 6);
 
@@ -453,10 +469,10 @@ void batman_state::batman(machine_config &config)
 	TILEMAP(config, "vad:playfield2", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64, 0).set_info_callback(FUNC(batman_state::get_playfield2_tile_info));
 	TILEMAP(config, "vad:alpha", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_ROWS, 64, 30, 0).set_info_callback(FUNC(batman_state::get_alpha_tile_info));
 
-	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, batman_state::s_mob_config).set_gfxdecode("gfxdecode");
+	ATARI_MOTION_OBJECTS(config, m_mob, m_screen, batman_state::s_mob_config).set_gfxdecode("gfxdecode");
 	m_mob->set_xoffset(-1);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	// note: these parameters are from published specs, not derived
 	// the board uses a VAD chip to generate video signals
@@ -467,7 +483,7 @@ void batman_state::batman(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ATARI_JSA_III(config, m_jsa, 0);
+	ATARI_JSA_III(config, m_jsa);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_6);
 	m_jsa->test_read_cb().set_ioport("260010").bit(6);
 	m_jsa->add_route(ALL_OUTPUTS, "mono", 1.0);

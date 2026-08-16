@@ -88,7 +88,7 @@ public:
 		, m_digits(*this, "digit%u", 0U)
 	{ }
 
-	void acommand(machine_config &config);
+	void acommand(machine_config &config) ATTR_COLD;
 
 private:
 	void oki_bank_w(uint8_t data);
@@ -129,7 +129,10 @@ private:
 
 void acommand_state::machine_start()
 {
-	m_digits.resolve();
+	save_item(NAME(m_7seg0));
+	save_item(NAME(m_7seg1));
+	save_item(NAME(m_ufo_lane));
+	save_item(NAME(m_boss_door));
 }
 
 // TODO: copied over from cischeat_draw_sprites, merge in common device
@@ -496,7 +499,7 @@ void acommand_state::acommand(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &acommand_state::main_map);
 	TIMER(config, "scantimer").configure_scanline(FUNC(acommand_state::scanline_cb), "screen", 0, 1);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	// assume same as armchmp2
 	screen.set_raw(XTAL(12'000'000)/2,396,0,256,256,16,240);
 	screen.set_screen_update(FUNC(acommand_state::screen_update));
@@ -509,16 +512,15 @@ void acommand_state::acommand(machine_config &config)
 	MEGASYS1_TILEMAP(config, m_txtmap, m_palette, 0x2700);
 
 	// assume amplified stereo
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	OKIM6295(config, m_oki[0], 2112000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
-	m_oki[0]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_oki[0]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	m_oki[0]->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
 	OKIM6295(config, m_oki[1], 2112000, okim6295_device::PIN7_HIGH); // clock frequency & pin 7 not verified
-	m_oki[1]->add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	m_oki[1]->add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	m_oki[1]->add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 }
 
 /***************************************************************************

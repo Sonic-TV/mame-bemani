@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 ##
-## icense:BSD-3-Clause
+## license:BSD-3-Clause
 ## copyright-holders:Vas Crabb
 
 import io
@@ -26,8 +26,12 @@ def pathsplit(p):
 if __name__ == '__main__':
     extpat = re.compile('.+\\.(h|hpp)$')
     substpat = re.compile('[-.]')
-    guardpat = re.compile('^ *# *ifndef +([^\s]+)(\s+.*)?')
+    guardpat = re.compile(r'^ *# *ifndef +([^\s]+)(\s+.*)?')
     bad = False
+    if len(sys.argv) < 2:
+        sys.stderr.write("Error: requires at least one path defined\n")
+        sys.exit(2)
+
     for root in sys.argv[1:]:
         for path, subdirs, files in os.walk(root):
             prefix = 'MAME_' + '_'.join([n.upper() for n in pathsplit(os.path.relpath(path, root))]) + '_'

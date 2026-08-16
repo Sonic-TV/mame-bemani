@@ -42,7 +42,7 @@
 #include "sound/flt_rc.h"
 #include "video/hd44780.h"
 #include "video/pwm.h"
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 #include "dd9.lh"
@@ -126,7 +126,7 @@ public:
 private:
 	virtual void driver_start() override;
 
-	void render_w(int state);
+	void screen_svg_update(screen_svg_device &screen);
 
 	required_device<gew7_device> m_maincpu;
 	optional_device<pwm_display_device> m_pwm;
@@ -200,11 +200,8 @@ void psr150_state::pwm_col_w(int state)
 		m_pwm->write_mx(m_pwm_col);
 }
 
-void psr150_state::render_w(int state)
+void psr150_state::screen_svg_update(screen_svg_device &screen)
 {
-	if (!state)
-		return;
-
 	const u8* render = m_lcdc->render();
 	for (int x = 0; x != 64; x++) {
 		for (int y = 0; y != 8; y++) {
@@ -219,11 +216,6 @@ void psr150_state::render_w(int state)
 
 void psr150_state::driver_start()
 {
-	m_outputs.resolve();
-	m_led.resolve();
-	m_digit.resolve();
-	m_switch.resolve();
-
 	m_switch = 0x2; // "Voice Play" mode
 
 	save_item(NAME(m_key_sel));
@@ -245,11 +237,10 @@ void psr150_state::psr150(machine_config &config)
 
 	// set up AC filters since the keyboard purposely outputs a DC offset when idle
 	// TODO: there is also a RLC lowpass with R=120, L=3.3mH, C=0.33uF (or R=150 for psr110)
-	FILTER_RC(config, "lfilter").set_ac().add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_RC(config, "rfilter").set_ac().add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_RC(config, "lfilter").set_ac().add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_RC(config, "rfilter").set_ac().add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	config.set_default_layout(layout_psr150);
 }
@@ -362,11 +353,10 @@ void psr150_state::psr180(machine_config &config)
 
 	// set up AC filters since the keyboard purposely outputs a DC offset when idle
 	// TODO: there is also a RLC lowpass with R=120, L=3.3mH, C=0.39uF
-	FILTER_RC(config, "lfilter").set_ac().add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_RC(config, "rfilter").set_ac().add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_RC(config, "lfilter").set_ac().add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_RC(config, "rfilter").set_ac().add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	config.set_default_layout(layout_psr180);
 }
@@ -432,11 +422,10 @@ void psr150_state::psr190_base(machine_config &config)
 	KS0066(config, m_lcdc, 270'000); // OSC = 91K resistor, TODO: actually KS0076B-00
 	m_lcdc->set_lcd_size(2, 8);
 
-	screen_device& screen(SCREEN(config, "screen", SCREEN_TYPE_SVG));
+	screen_svg_device& screen(SCREEN_SVG(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_size(1000, 775);
-	screen.set_visarea_full();
-	screen.screen_vblank().set(FUNC(psr150_state::render_w));
+	screen.set_screen_svg_update(FUNC(psr150_state::screen_svg_update));
 }
 
 void psr150_state::psr190(machine_config &config)
@@ -448,11 +437,10 @@ void psr150_state::psr190(machine_config &config)
 
 	// set up AC filters since the keyboard purposely outputs a DC offset when idle
 	// TODO: there is also a RLC lowpass with R=120, L=3.3mH, C=0.33uF
-	FILTER_RC(config, "lfilter").set_ac().add_route(ALL_OUTPUTS, "lspeaker", 1.0);
-	FILTER_RC(config, "rfilter").set_ac().add_route(ALL_OUTPUTS, "rspeaker", 1.0);
+	FILTER_RC(config, "lfilter").set_ac().add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
+	FILTER_RC(config, "rfilter").set_ac().add_route(ALL_OUTPUTS, "speaker", 1.0, 1);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 }
 
 void psr150_state::psr78(machine_config &config)

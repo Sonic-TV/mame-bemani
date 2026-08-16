@@ -844,24 +844,23 @@ void nss_state::nss(machine_config &config)
 
 	M50458(config, m_m50458, 4000000, "osd"); /* TODO: correct clock */
 	S3520CF(config, m_s3520cf); /* RTC */
-	RP5H01(config, m_rp5h01, 0);
+	RP5H01(config, m_rp5h01);
 	M6M80011AP(config, "m6m80011ap");
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	S_DSP(config, m_s_dsp, XTAL(24'576'000) / 12);
+	S_DSP(config, m_s_dsp, XTAL(24'576'000));
 	m_s_dsp->set_addrmap(0, &nss_state::spc_map);
-	m_s_dsp->add_route(0, "lspeaker", 1.00);
-	m_s_dsp->add_route(1, "rspeaker", 1.00);
+	m_s_dsp->add_route(0, "speaker", 1.00, 0);
+	m_s_dsp->add_route(1, "speaker", 1.00, 1);
 
 	/* video hardware */
 	/* TODO: the screen should actually superimpose, but for the time being let's just separate outputs */
 	config.set_default_layout(layout_dualhsxs);
 
 	// SNES PPU
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(DOTCLK_NTSC * 2, SNES_HTOTAL * 2, 0, SNES_SCR_WIDTH * 2, SNES_VTOTAL_NTSC, 0, SNES_SCR_HEIGHT_NTSC);
 	m_screen->set_video_attributes(VIDEO_VARIABLE_WIDTH);
 	m_screen->set_screen_update(FUNC(snes_state::screen_update));
@@ -872,7 +871,7 @@ void nss_state::nss(machine_config &config)
 	m_ppu->set_screen("screen");
 
 	// NSS
-	screen_device &osd(SCREEN(config, "osd", SCREEN_TYPE_RASTER));
+	screen_device &osd(SCREEN(config, "osd"));
 	osd.set_refresh_hz(60);
 	osd.set_vblank_time(ATTOSECONDS_IN_USEC(2500));
 	osd.set_size(288+22, 216+22);

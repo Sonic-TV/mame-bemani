@@ -36,6 +36,8 @@ this reason.
 #include "cpu/z80/z80.h"
 #include "machine/cxd1095.h"
 
+#include "endianness.h"
+
 
 namespace {
 
@@ -707,8 +709,8 @@ void mplay_state::megaplay(machine_config &config)
 	m_vdp1->set_hcounter_divide(5);
 	m_vdp1->set_is_pal(false);
 	m_vdp1->n_int().set_inputline(m_bioscpu, 0);
-	m_vdp1->add_route(ALL_OUTPUTS, "lspeaker", 0.25);
-	m_vdp1->add_route(ALL_OUTPUTS, "rspeaker", 0.25);
+	m_vdp1->add_route(ALL_OUTPUTS, "speaker", 0.25);
+	m_vdp1->add_route(ALL_OUTPUTS, "speaker", 0.25);
 }
 
 

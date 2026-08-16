@@ -406,7 +406,7 @@ void canyon_state::canyon(machine_config &config)
 	WATCHDOG_TIMER(config, m_watchdog).set_vblank_count("screen", 8);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(12.096_MHz_XTAL / 2, 384, 0, 256, 262, 0, 240); // HSYNC = 15,750 Hz
 	screen.set_screen_update(FUNC(canyon_state::screen_update));
 	screen.set_palette(m_palette);
@@ -416,12 +416,11 @@ void canyon_state::canyon(machine_config &config)
 	PALETTE(config, m_palette, FUNC(canyon_state::palette), 4);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DISCRETE(config, m_discrete, canyon_discrete);
-	m_discrete->add_route(0, "lspeaker", 1.0);
-	m_discrete->add_route(1, "rspeaker", 1.0);
+	m_discrete->add_route(0, "speaker", 1.0, 0);
+	m_discrete->add_route(1, "speaker", 1.0, 1);
 }
 
 

@@ -26,6 +26,7 @@ DIP locations verified for:
 
 #include "emupal.h"
 #include "screen.h"
+#include "sound.h"
 #include "speaker.h"
 
 
@@ -695,7 +696,7 @@ void kamikaze_state::kamikaze(machine_config &config)
 	m_ppi8255[1]->out_pb_callback().set(FUNC(kamikaze_state::sound2_w));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(XTAL(4'915'200), 320, 0, 256, 256, 32, 256);
 	m_screen->set_screen_update(FUNC(kamikaze_state::screen_update));
 
@@ -733,7 +734,7 @@ void spaceint_state::spaceint(machine_config &config)
 	m_maincpu->set_vblank_int("screen", FUNC(spaceint_state::irq0_line_hold));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_size(32*8, 32*8);
 	m_screen->set_visarea(0*8, 32*8-1, 1*8, 31*8-1);
 	m_screen->set_refresh_hz(60);
@@ -781,6 +782,20 @@ ROM_START( astinvad )
 
 	ROM_REGION( 0x0400, "proms", 0 )
 	ROM_LOAD( "ai_vid_c.rom", 0x0000, 0x0400, CRC(b45287ff) SHA1(7e558eaf402641d7ff60171f854030219fbf9a59) )
+ROM_END
+
+ROM_START( astinvadb )
+	ROM_REGION( 0x10000, "maincpu", 0 )
+	ROM_LOAD( "killer2_1.bin", 0x0000, 0x0400, CRC(20e3ec41) SHA1(7e77fa3c51d1e83ce91a24808301d9f1e0bed18e) )
+	ROM_LOAD( "killer2_2.bin", 0x0400, 0x0400, CRC(581625cf) SHA1(adac0c1f27c3f3c02ec14c1db8dc73febe01545f) )
+	ROM_LOAD( "killer2_3.bin", 0x0800, 0x0400, CRC(7ea9b6d6) SHA1(d9f9a3a0e0c68e022dec6c3c9a8266cdce06cb64) )
+	ROM_LOAD( "killer2_4.bin", 0x0c00, 0x0400, CRC(0d305d5f) SHA1(1581717d6c0472b5adb36f3d35cccb63dc4ba209) )
+	ROM_LOAD( "killer2_5.bin", 0x1000, 0x0400, CRC(fee681ec) SHA1(b4b94f62e598030e6a432a0bb83d18d0e342aed9) )
+	ROM_LOAD( "killer2_6.bin", 0x1400, 0x0400, CRC(eb338863) SHA1(e841c6c5903dd6dee9ec2fedaff431f4a31d738a) )
+	ROM_LOAD( "killer2_7.bin", 0x1800, 0x0400, CRC(9e2d279d) SHA1(357835761974ace956c965c0dd920a0692a5a2ea) )
+
+	ROM_REGION( 0x0400, "proms", 0 )
+	ROM_LOAD( "killer2_1-8.bin", 0x0000, 0x0400, CRC(d62a3e62) SHA1(00d42988203fbf167791cf5b887f06d1d015e942) )
 ROM_END
 
 ROM_START( kosmokil )
@@ -859,6 +874,7 @@ ROM_END
 
 GAME( 1980,  kamikaze,  0,        kamikaze, kamikaze,  kamikaze_state, empty_init, ROT270, "Konami (Leijac Corporation license)", "Kamikaze", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980,  astinvad,  kamikaze, kamikaze, astinvad,  kamikaze_state, empty_init, ROT270, "Konami (Stern Electronics license)", "Astro Invader", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
+GAME( 1980?, astinvadb, kamikaze, kamikaze, astinvad,  kamikaze_state, empty_init, ROT270, "bootleg", "Astro Invader (bootleg)", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1980?, kosmokil,  kamikaze, kamikaze, kamikaze,  kamikaze_state, empty_init, ROT270, "bootleg (BEM)", "Kosmo Killer", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE ) // says >BEM< Mi Italy but it looks hacked in, different revision of game tho.
 GAME( 1980?, betafrce,  kamikaze, kamikaze, kamikaze,  kamikaze_state, empty_init, ROT270, "bootleg (Omni)", "Beta Force", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )
 GAME( 1979,  spcking2,  0,        spcking2, spcking2,  spcking2_state, empty_init, ROT270, "Konami", "Space King 2", MACHINE_IMPERFECT_SOUND | MACHINE_SUPPORTS_SAVE )

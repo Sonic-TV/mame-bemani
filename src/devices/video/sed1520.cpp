@@ -8,6 +8,10 @@
     NT7502 LCD controller
 
     TODO:
+    - add a callback for outputting com/seg pins (in theory, the chip doesn't
+      require a raster screen, and can be used for eg. a 7seg panel)
+    - screen update callback shouldn't have any business with internal state
+      of the chip, such as m_start_line
     - busy flag
 
 ***************************************************************************/
@@ -469,6 +473,11 @@ void nt7502_device::control_write(uint8_t data)
 	}
 }
 
+
+std::tuple<bool, bool, uint8_t *, uint8_t, uint8_t, uint8_t> sed1520_device::render()
+{
+	return std::make_tuple(m_static_drive, m_lcd_on, m_ddr.get(), m_start_line, m_adc, m_duty);
+}
 
 uint32_t sed1520_device::screen_update(screen_device &screen, bitmap_ind16 &bitmap, const rectangle &cliprect)
 {

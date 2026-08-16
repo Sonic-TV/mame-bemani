@@ -423,10 +423,10 @@ void aquarium_state::aquarium(machine_config &config)
 	m_audiocpu->set_addrmap(AS_IO, &aquarium_state::snd_portmap);
 
 	// Confirmed IC type, even though some other Excellent games from this period use a MAX693.
-	MB3773(config, m_watchdog, 0);
+	MB3773(config, m_watchdog);
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 64*8);
@@ -438,14 +438,13 @@ void aquarium_state::aquarium(machine_config &config)
 	GFXDECODE(config, m_gfxdecode, m_palette, gfx_aquarium);
 	PALETTE(config, m_palette).set_format(palette_device::RRRRGGGGBBBBRGBx, 0x1000 / 2);
 
-	EXCELLENT_SPRITE(config, m_sprgen, 0);
+	EXCELLENT_SPRITE(config, m_sprgen);
 	m_sprgen->set_palette(m_palette);
 	m_sprgen->set_color_base(0x300);
 	m_sprgen->set_colpri_callback(FUNC(aquarium_state::aquarium_colpri_cb));
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	GENERIC_LATCH_8(config, m_soundlatch);
 	m_soundlatch->data_pending_callback().set_inputline(m_audiocpu, INPUT_LINE_NMI);
@@ -453,12 +452,12 @@ void aquarium_state::aquarium(machine_config &config)
 
 	ym2151_device &ymsnd(YM2151(config, "ymsnd", XTAL(14'318'181) / 4)); // clock not verified on PCB
 	ymsnd.irq_handler().set_inputline(m_audiocpu, 0);
-	ymsnd.add_route(0, "lspeaker", 0.45);
-	ymsnd.add_route(1, "rspeaker", 0.45);
+	ymsnd.add_route(0, "speaker", 0.45, 0);
+	ymsnd.add_route(1, "speaker", 0.45, 1);
 
 	OKIM6295(config, m_oki, XTAL(1'056'000), okim6295_device::PIN7_HIGH); // pin 7 not verified
-	m_oki->add_route(ALL_OUTPUTS, "lspeaker", 0.47);
-	m_oki->add_route(ALL_OUTPUTS, "rspeaker", 0.47);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.47, 0);
+	m_oki->add_route(ALL_OUTPUTS, "speaker", 0.47, 1);
 }
 
 ROM_START( aquarium )

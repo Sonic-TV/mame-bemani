@@ -508,7 +508,7 @@ void vocalizer_state::vocalizer(machine_config &config)
 	m_uart[1]->tx_cb().set("mdout", FUNC(midi_port_device::write_txd));
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_LCD));
+	screen_device &screen(SCREEN(config, "screen").set_lcd());
 	screen.set_refresh_hz(50);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	screen.set_size(6*16 + 1, 10);
@@ -522,8 +522,7 @@ void vocalizer_state::vocalizer(machine_config &config)
 	m_lcdc->set_lcd_size(2, 8);
 	m_lcdc->set_pixel_update_cb(FUNC(vocalizer_state::lcd_pixel_update));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	ES5503(config, m_es5503, 8_MHz_XTAL).set_channels(16);
 	m_es5503->set_addrmap(0, &vocalizer_state::sound_map);
@@ -531,14 +530,14 @@ void vocalizer_state::vocalizer(machine_config &config)
 	for (int i = 0; i < 16; i++)
 	{
 		if (i <= 8)
-			m_es5503->add_route(i, "lspeaker", 1.0);
+			m_es5503->add_route(i, "speaker", 1.0, 0);
 		else if (i < 15)
-			m_es5503->add_route(i, "lspeaker", (15 - i) / 7.0);
+			m_es5503->add_route(i, "speaker", (15 - i) / 7.0, 0);
 
 		if (i >= 8)
-			m_es5503->add_route(i, "rspeaker", 1.0);
+			m_es5503->add_route(i, "speaker", 1.0, 1);
 		else if (i > 0)
-			m_es5503->add_route(i, "rspeaker", i / 8.0);
+			m_es5503->add_route(i, "speaker", i / 8.0, 1);
 	}
 }
 

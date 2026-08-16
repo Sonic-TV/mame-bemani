@@ -41,7 +41,7 @@
 class tpi6525_device : public device_t
 {
 public:
-	tpi6525_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	tpi6525_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	auto out_irq_cb() { return m_out_irq_cb.bind(); }
 	auto in_pa_cb() { return m_in_pa_cb.bind(); }
@@ -77,10 +77,6 @@ public:
 	void pb5_w(int state) { port_line_w(m_in_b, 5, state); }
 	void pb6_w(int state) { port_line_w(m_in_b, 6, state); }
 	void pb7_w(int state) { port_line_w(m_in_b, 7, state); }
-
-	uint8_t get_ddr_a();
-	uint8_t get_ddr_b();
-	uint8_t get_ddr_c();
 
 protected:
 	// device-level overrides

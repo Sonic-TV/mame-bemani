@@ -4,6 +4,8 @@
 #include "k001005.h"
 #include "screen.h"
 
+#include "corefloat.h"
+
 /*****************************************************************************/
 /* Konami K001005 Polygon Renderer (KS10071) */
 
@@ -704,7 +706,7 @@ void k001005_renderer::draw(bitmap_rgb32 &bitmap, const rectangle &cliprect)
 
 
 
-DEFINE_DEVICE_TYPE(K001005, k001005_device, "k001005", "K001005 Polygon Renderer")
+DEFINE_DEVICE_TYPE(K001005, k001005_device, "k001005", "Konami 001005 Polygon Renderer")
 
 k001005_device::k001005_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock)
 	: device_t(mconfig, K001005, tag, owner, clock)
@@ -788,7 +790,7 @@ uint32_t k001005_device::read(address_space &space, offs_t offset, uint32_t mem_
 			{
 				//osd_printf_debug("FIFO_r1: %08X\n", m_fifo_read_ptr);
 				uint16_t const value = m_fifo[m_fifo_read_ptr] & 0xffff;
-	
+
 				if (!machine().side_effects_disabled())
 				{
 					if (m_status != 1 && m_status != 2)
@@ -802,7 +804,7 @@ uint32_t k001005_device::read(address_space &space, offs_t offset, uint32_t mem_
 					{
 						dsp->set_flag_input(1, ASSERT_LINE);
 					}
-	
+
 					m_fifo_read_ptr++;
 					m_fifo_read_ptr &= 0x7ff;
 				}

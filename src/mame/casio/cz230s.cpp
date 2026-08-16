@@ -34,7 +34,7 @@
 #include "sound/upd934g.h"
 #include "video/mn1252.h"
 
-#include "screen.h"
+#include "screen_svg.h"
 #include "speaker.h"
 
 #include "cz230s.lh"
@@ -95,7 +95,7 @@ private:
 	void port_a_w(u8 data);
 	u8 keys_r();
 
-	void render_w(int state);
+	void screen_update(screen_svg_device &screen);
 
 	required_device<upd7811_device> m_maincpu;
 	required_device<mn1252_device> m_lcdc;
@@ -420,11 +420,6 @@ INPUT_PORTS_END
 
 void cz230s_state::machine_start()
 {
-	m_lcd_seg.resolve();
-	m_led.resolve();
-	m_rhythm.resolve();
-	m_mode.resolve();
-
 	m_rhythm = 1;
 	m_mode = 1;
 
@@ -542,11 +537,8 @@ ioport_value cz230s_state::cassette_r()
 }
 
 /**************************************************************************/
-void cz230s_state::render_w(int state)
+void cz230s_state::screen_update(screen_svg_device &screen)
 {
-	if (!state)
-		return;
-
 	for (int digit = 0; digit < 6; digit++)
 	{
 		const u16 data = m_lcdc->output(digit);
@@ -583,11 +575,10 @@ void cz230s_state::config_base(machine_config &config, u16 screen_w, u16 screen_
 
 	MN1252(config, m_lcdc);
 
-	auto &screen = SCREEN(config, "screen", SCREEN_TYPE_SVG);
+	auto &screen = SCREEN_SVG(config, "screen");
 	screen.set_refresh_hz(60);
 	screen.set_size(screen_w, screen_h);
-	screen.set_visarea_full();
-	screen.screen_vblank().set(FUNC(cz230s_state::render_w));
+	screen.set_screen_svg_update(FUNC(cz230s_state::screen_update));
 
 	SPEAKER(config, "speaker").front_center();
 

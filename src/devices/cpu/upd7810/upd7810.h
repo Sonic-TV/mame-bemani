@@ -15,7 +15,7 @@
 
 enum
 {
-	UPD7810_PC=1, UPD7810_SP, UPD7810_PSW,
+	UPD7810_PC=1, UPD7810_SP, UPD7810_PSW, UPD7810_IFF,
 	UPD7810_EA, UPD7810_V, UPD7810_A, UPD7810_VA,
 	UPD7810_BC, UPD7810_B, UPD7810_C, UPD7810_DE, UPD7810_D, UPD7810_E, UPD7810_HL, UPD7810_H, UPD7810_L,
 	UPD7810_EA2, UPD7810_V2, UPD7810_A2, UPD7810_VA2,
@@ -90,6 +90,7 @@ protected:
 	void upd_internal_256_ram_map(address_map &map) ATTR_COLD;
 	void upd_internal_4096_rom_128_ram_map(address_map &map) ATTR_COLD;
 	void upd_internal_4096_rom_256_ram_map(address_map &map) ATTR_COLD;
+	void upd_internal_16k_rom_256_ram_map(address_map &map) ATTR_COLD;
 
 	// flags
 	enum
@@ -201,6 +202,7 @@ protected:
 	virtual void configure_ops();
 	virtual uint8_t read_pc();
 	virtual void write_pc(uint8_t data);
+	void write_smh(uint8_t data);
 
 	static const struct opcode_s s_op48[256];
 	static const struct opcode_s s_op4C[256];
@@ -237,6 +239,7 @@ protected:
 	static const struct opcode_s s_opXX_78c06[256];
 
 	address_space_config m_program_config;
+	address_space_config m_io_config; // 7800/01/02 only
 	memory_view m_ram_view;
 
 	PAIR    m_ppc;    /* previous program counter */
@@ -311,6 +314,7 @@ protected:
 	int     m_nmi;    /* keep track of current nmi state. Needed for 7810 irq checking. */
 	int     m_int1;   /* keep track of current int1 state. Needed for irq checking. */
 	int     m_int2;   /* keep track to current int2 state. Needed for irq checking. */
+	uint8_t m_halt;
 
 	/* internal helper variables */
 	uint16_t  m_txs;    /* transmitter shift register */
@@ -342,6 +346,7 @@ protected:
 	const struct opcode_s *m_op74;
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::cache m_opcodes;
 	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_program;
+	memory_access<16, 0, 0, ENDIANNESS_LITTLE>::specific m_io;
 	int m_icount;
 
 	uint8_t RP(offs_t port);
@@ -388,7 +393,7 @@ protected:
 	void RLD();
 	void RRD();
 	void NEGA();
-	void HALT();
+	void HLT();
 	void DIV_A();
 	void DIV_B();
 	void DIV_C();
@@ -1384,6 +1389,14 @@ public:
 };
 
 
+class upd78c14_device : public upd78c10_device
+{
+public:
+	// construction/destruction
+	upd78c14_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+};
+
+
 class upd7807_device : public upd7810_device
 {
 public:
@@ -1408,6 +1421,7 @@ protected:
 	virtual uint64_t execute_clocks_to_cycles(uint64_t clocks) const noexcept override { return (clocks + 2 - 1) / 2; }
 	virtual uint64_t execute_cycles_to_clocks(uint64_t cycles) const noexcept override { return (cycles * 2); }
 	virtual void execute_set_input(int inputnum, int state) override;
+	virtual space_config_vector memory_space_config() const override;
 	virtual std::unique_ptr<util::disasm_interface> create_disassembler() override;
 	virtual void handle_timers(int cycles) override;
 	virtual void upd7810_take_irq() override;
@@ -1449,6 +1463,7 @@ DECLARE_DEVICE_TYPE(UPD7810,  upd7810_device)
 DECLARE_DEVICE_TYPE(UPD78C10, upd78c10_device)
 DECLARE_DEVICE_TYPE(UPD7811,  upd7811_device)
 DECLARE_DEVICE_TYPE(UPD78C11, upd78c11_device)
+DECLARE_DEVICE_TYPE(UPD78C14, upd78c14_device)
 DECLARE_DEVICE_TYPE(UPD7807,  upd7807_device)
 DECLARE_DEVICE_TYPE(UPD7801,  upd7801_device)
 DECLARE_DEVICE_TYPE(UPD78C05, upd78c05_device)

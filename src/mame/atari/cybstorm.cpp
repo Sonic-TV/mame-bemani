@@ -193,88 +193,96 @@ uint32_t cybstorm_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_vad->mob().bitmap();
-	for (const sparse_dirty_rect *rect = m_vad->mob().first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->top(); y <= rect->bottom(); y++)
-		{
-			uint16_t const *const mo = &mobitmap.pix(y);
-			uint16_t *const pf = &bitmap.pix(y);
-			uint8_t const *const pri = &priority_bitmap.pix(y);
-			for (int x = rect->left(); x <= rect->right(); x++)
-				if (mo[x])
+	m_vad->mob().iterate_dirty_rects(
+			cliprect,
+			[&bitmap, &priority_bitmap, &mobitmap] (rectangle const &rect)
+			{
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
-					int const mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
-
-					// upper bit of MO priority signals special rendering and doesn't draw anything
-					if (mopriority & 4)
+					uint16_t const *const mo = &mobitmap.pix(y);
+					uint16_t *const pf = &bitmap.pix(y);
+					uint8_t const *const pri = &priority_bitmap.pix(y);
+					for (int x = rect.left(); x <= rect.right(); x++)
 					{
-						if ((mopriority & 0x3) != 0)
-							continue;
+						if (mo[x])
+						{
+							int const mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
+
+							// upper bit of MO priority signals special rendering and doesn't draw anything
+							if (mopriority & 4)
+							{
+								if ((mopriority & 0x3) != 0)
+									continue;
+							}
+
+							if (pri[x] & 0x80)
+							{
+								// foreground playfield case
+								int const pfpriority = (pri[x] >> 2) & 3;
+
+								if (mopriority > pfpriority)
+									pf[x] = (mo[x] & atari_motion_objects_device::DATA_MASK) | 0x1000;
+							}
+							else
+							{
+								// background playfield case
+								int const pfpriority = pri[x] & 3;
+
+								// playfield priority 3 always wins
+								if (pfpriority != 3)
+								{
+									// otherwise, MOs get shown
+									pf[x] = (mo[x] & atari_motion_objects_device::DATA_MASK) | 0x1000;
+								}
+							}
+
+							// don't erase yet -- we need to make another pass later
+						}
 					}
-
-					// foreground playfield case
-					if (pri[x] & 0x80)
-					{
-						int const pfpriority = (pri[x] >> 2) & 3;
-
-						if (mopriority > pfpriority)
-							pf[x] = (mo[x] & atari_motion_objects_device::DATA_MASK) | 0x1000;
-					}
-
-					// background playfield case
-					else
-					{
-						int const pfpriority = pri[x] & 3;
-
-						// playfield priority 3 always wins
-						if (pfpriority == 3)
-							;
-
-						// otherwise, MOs get shown
-						else
-							pf[x] = (mo[x] & atari_motion_objects_device::DATA_MASK) | 0x1000;
-					}
-
-					// don't erase yet -- we need to make another pass later
 				}
-		}
+			});
 
 	// now go back and process the upper bit of MO priority
-	for (const sparse_dirty_rect *rect = m_vad->mob().first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->top(); y <= rect->bottom(); y++)
-		{
-			uint16_t *const mo = &mobitmap.pix(y);
-			uint16_t *const pf = &bitmap.pix(y);
-			int count = 0;
-			for (int x = rect->left(); x <= rect->right() || (count && x < bitmap.width()); x++)
+	m_vad->mob().iterate_dirty_rects(
+			cliprect,
+			[&bitmap, &mobitmap] (rectangle const &rect)
 			{
-				const uint16_t START_MARKER = ((4 << atari_motion_objects_device::PRIORITY_SHIFT) | 3);
-				const uint16_t END_MARKER =   ((4 << atari_motion_objects_device::PRIORITY_SHIFT) | 7);
-				const uint16_t MASK = ((4 << atari_motion_objects_device::PRIORITY_SHIFT) | 0x3f);
-
-				// TODO: Stain pixels should not overlap sprites!
-				if ((mo[x] & MASK) == START_MARKER)
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
-					count++;
-				}
-
-				if (count)
-				{
-					// Only applies to PF pixels
-					if ((pf[x] & 0x1000) == 0)
+					uint16_t *const mo = &mobitmap.pix(y);
+					uint16_t *const pf = &bitmap.pix(y);
+					int count = 0;
+					for (int x = rect.left(); x <= rect.right() || (count && x < bitmap.width()); x++)
 					{
-						pf[x] |= 0x2000;
+						const uint16_t START_MARKER = ((4 << atari_motion_objects_device::PRIORITY_SHIFT) | 3);
+						const uint16_t END_MARKER =   ((4 << atari_motion_objects_device::PRIORITY_SHIFT) | 7);
+						const uint16_t MASK = ((4 << atari_motion_objects_device::PRIORITY_SHIFT) | 0x3f);
+
+						// TODO: Stain pixels should not overlap sprites!
+						if ((mo[x] & MASK) == START_MARKER)
+						{
+							count++;
+						}
+
+						if (count)
+						{
+							// Only applies to PF pixels
+							if ((pf[x] & 0x1000) == 0)
+							{
+								pf[x] |= 0x2000;
+							}
+						}
+
+						if ((mo[x] & MASK) == END_MARKER)
+						{
+							count--;
+						}
+
+						// erase behind ourselves
+						mo[x] = 0;
 					}
 				}
-
-				if ((mo[x] & MASK) == END_MARKER)
-				{
-					count--;
-				}
-
-				// erase behind ourselves
-				mo[x] = 0;
-			}
-		}
+			});
 
 	// add the alpha on top
 	m_vad->alpha().draw(screen, bitmap, cliprect, 0, 0);
@@ -484,19 +492,19 @@ void cybstorm_state::round2(machine_config &config)
 	WATCHDOG_TIMER(config, "watchdog");
 
 	// video hardware
-	ATARI_VAD(config, m_vad, 0, m_screen);
+	ATARI_VAD(config, m_vad, m_screen);
 	m_vad->scanline_int_cb().set_inputline(m_maincpu, M68K_IRQ_4);
 	TILEMAP(config, "vad:playfield", m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(FUNC(cybstorm_state::get_playfield_tile_info));
 	TILEMAP(config, "vad:playfield2", m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64, 0).set_info_callback(FUNC(cybstorm_state::get_playfield2_tile_info));
 	TILEMAP(config, "vad:alpha", m_gfxdecode, 2, 8, 8, TILEMAP_SCAN_ROWS, 64, 30, 0).set_info_callback(FUNC(cybstorm_state::get_alpha_tile_info));
-	ATARI_MOTION_OBJECTS(config, "vad:mob", 0, m_screen, cybstorm_state::s_mob_config).set_gfxdecode(m_gfxdecode);
+	ATARI_MOTION_OBJECTS(config, "vad:mob", m_screen, cybstorm_state::s_mob_config).set_gfxdecode(m_gfxdecode);
 
 	ADDRESS_MAP_BANK(config, "vadbank").set_map(&cybstorm_state::vadbank_map).set_options(ENDIANNESS_BIG, 16, 32, 0x90000);
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_cybstorm);
 	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 32768);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_palette("palette");
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	// note: these parameters are from published specs, not derived
@@ -511,14 +519,13 @@ void cybstorm_state::cybstorm(machine_config &config)
 	round2(config);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	ATARI_JSA_IIIS(config, m_jsa, 0);
+	ATARI_JSA_IIIS(config, m_jsa);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_6);
 	m_jsa->test_read_cb().set_ioport("9F0010").bit(22);
-	m_jsa->add_route(0, "lspeaker", 0.9);
-	m_jsa->add_route(1, "rspeaker", 0.9);
+	m_jsa->add_route(0, "speaker", 0.9, 0);
+	m_jsa->add_route(1, "speaker", 0.9, 1);
 }
 
 

@@ -305,7 +305,7 @@ public:
 		driver_device(mconfig, type, tag),
 		m_maincpu(*this, "maincpu"),
 		m_audiocpu(*this, "audiocpu"),
-		m_ncr53cf96(*this, "scsi:7:ncr53cf96"),
+		m_ncr53cf96(*this, "ncr53cf96"),
 		m_ata(*this, "ata"),
 		m_dpram(*this, "dpram"),
 		m_waveram(*this, "rfsnd"),
@@ -598,18 +598,6 @@ static const uint16_t asciicharset[]=
 void twinkle_state::machine_start()
 {
 	m_dma_timer = timer_alloc(FUNC(twinkle_state::scsi_dma_transfer), this);
-
-	m_led_displays.resolve();
-	m_spotlights.resolve();
-	m_main_leds.resolve();
-	m_key_leds.resolve();
-	m_spu_leds.resolve();
-	m_player_lamps.resolve();
-	m_vefx_lamp.resolve();
-	m_effect_lamp.resolve();
-	m_credit_lamp.resolve();
-	m_neon_lamp.resolve();
-	m_unknown_outputs.resolve();
 
 	save_item(NAME(m_spu_ctrl));
 	save_item(NAME(m_spu_ata_dma));
@@ -1194,7 +1182,7 @@ void twinkle_state::spu_wavebank_w(offs_t offset, uint16_t data, uint16_t mem_ma
 	// then to bank 2, and finally to bank 3.
 	//
 	// neither the 68k nor DMA access wave RAM when the bank is 0.
-	m_wave_bank = data * (4*1024*1024);
+	m_wave_bank = data * 0x400000;
 }
 
 uint16_t twinkle_state::twinkle_waveram_r(offs_t offset)
@@ -1310,26 +1298,21 @@ void twinkle_state::twinkle(machine_config &config)
 	m_dpram->intl_callback().set_inputline(m_audiocpu, M68K_IRQ_4); // address 0x3fe triggers M68K interrupt
 	// m_dpram->intr_callback().set_inputline(m_maincpu, M68K_IRQ_3); // address 0x3ff triggers PPC interrupt
 
-	NSCSI_BUS(config, "scsi");
-	NSCSI_CONNECTOR(config, "scsi:4").option_set("cdrom", NSCSI_XM5401).machine_config(
-			[](device_t *device)
-			{
-				device->subdevice<cdda_device>("cdda")->add_route(0, "^^speakerleft", 1.0);
-				device->subdevice<cdda_device>("cdda")->add_route(1, "^^speakerright", 1.0);
-			});
-	NSCSI_CONNECTOR(config, "scsi:7").option_set("ncr53cf96", NCR53CF96).clock(32_MHz_XTAL/2).machine_config(
-			[this](device_t *device)
-			{
-				ncr53cf96_device &adapter = downcast<ncr53cf96_device &>(*device);
-				adapter.irq_handler_cb().set(":maincpu:irq", FUNC(psxirq_device::intin10));
-				adapter.drq_handler_cb().set(*this, FUNC(twinkle_state::scsi_drq));
-			});
+	auto &scsi(NSCSI_BUS(config, "scsi"));
+	auto &cdrom(NSCSI_XM5401(config, "cdrom"));
+	scsi.set_external_device(4, cdrom);
+	cdrom.subdevice<cdda_device>("cdda")->add_route(0, ":speaker", 1.0, 0);
+	cdrom.subdevice<cdda_device>("cdda")->add_route(1, ":speaker", 1.0, 1);
+	NCR53CF96(config, m_ncr53cf96, 32_MHz_XTAL/2);
+	scsi.set_external_device(7, m_ncr53cf96);
+	m_ncr53cf96->irq_handler_cb().set(":maincpu:irq", FUNC(psxirq_device::intin10));
+	m_ncr53cf96->drq_handler_cb().set(DEVICE_SELF, FUNC(twinkle_state::scsi_drq));
 
 	ATA_INTERFACE(config, m_ata).options(ata_devices, "hdd", nullptr, true);
 	m_ata->irq_handler().set(FUNC(twinkle_state::spu_ata_irq));
 	m_ata->dmarq_handler().set(FUNC(twinkle_state::spu_ata_dmarq));
 
-	RTC65271(config, "rtc", 0);
+	RTC65271(config, "rtc");
 
 	FDC37C665GT(config, "fdc37c665gt", XTAL(24'000'000));
 
@@ -1338,23 +1321,22 @@ void twinkle_state::twinkle(machine_config &config)
 	gpu.set_screen("screen");
 	gpu.set_twinkle_hacks(true);
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	//all twinkle cabinets use anamorphic widescreen displays
 	screen.set_physical_aspect(16, 9);
 	screen.set_screen_update(FUNC(twinkle_state::screen_update));
 
 	/* sound hardware */
-	SPEAKER(config, "speakerleft").front_left();
-	SPEAKER(config, "speakerright").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	spu_device &spu(SPU(config, "spu", XTAL(67'737'600)/2, subdevice<psxcpu_device>("maincpu")));
-	spu.add_route(0, "speakerleft", 0.5);
-	spu.add_route(1, "speakerright", 0.5);
+	spu.add_route(0, "speaker", 0.5, 0);
+	spu.add_route(1, "speaker", 0.5, 1);
 
 	rf5c400_device &rf5c400(RF5C400(config, "rfsnd", XTAL(33'868'800)/2));
 	rf5c400.set_addrmap(0, &twinkle_state::rf5c400_map);
-	rf5c400.add_route(0, "speakerleft", 0.45);
-	rf5c400.add_route(1, "speakerright", 0.45);
+	rf5c400.add_route(0, "speaker", 0.45, 0);
+	rf5c400.add_route(1, "speaker", 0.45, 1);
 }
 
 void twinkle_state::twinkle_dvd_type1(machine_config &config)
@@ -1362,7 +1344,7 @@ void twinkle_state::twinkle_dvd_type1(machine_config &config)
 	// All versions before beatmania IIDX 2nd style
 	//   - maincpu:sio1 (PSX SIO1) is used for the DVD player
 	//   - fdc37c665gt:uart2 is used for network/session play
-	rs232_port_device &rs232(RS232_PORT(config, "rs232_dvd", 0));
+	rs232_port_device &rs232(RS232_PORT(config, "rs232_dvd"));
 	rs232.option_add("xvd701", JVC_XVD701);
 	rs232.set_default_option("xvd701");
 
@@ -1391,7 +1373,7 @@ void twinkle_state::twinkle_dvd_type2(machine_config &config)
 	// All versions starting from beatmania IIDX 2nd style
 	//   - fdc37c665gt:uart2 is used for the DVD player
 	//   - maincpu:sio1 (PSX SIO1) is used for network/session play
-	rs232_port_device &rs232(RS232_PORT(config, "rs232_dvd", 0));
+	rs232_port_device &rs232(RS232_PORT(config, "rs232_dvd"));
 	rs232.option_add("xvd701", JVC_XVD701);
 	// rs232.option_add("xvs1100", JVC_XVS1100); // 8th mix only
 	rs232.set_default_option("xvd701");
@@ -1443,7 +1425,7 @@ void twinkle_state::twinklei2(machine_config &config)
 	m_is_dvd_media = true;
 	twinkle(config);
 	twinkle_dvd_type2(config);
-	I2C_M24C02(config, "security", 0); // M24C02-W
+	I2C_M24C02(config, "security"); // M24C02-W
 }
 
 static INPUT_PORTS_START( twinkle )
@@ -1560,7 +1542,7 @@ ROM_START( bmiidx )
 	ROM_REGION( 0x224, "security", 0 )
 	ROM_LOAD( "863a02", 0x000000, 0x000224, BAD_DUMP CRC(078be99f) SHA1(7def88d18a9250a8e4b54a51bf663161676cd9be) )
 
-	DISK_REGION( "scsi:4:cdrom" ) // program
+	DISK_REGION( "cdrom" ) // program
 	DISK_IMAGE_READONLY( "gq863-jab01", 0, SHA1(331f80b40ed560c7e017621b7daeeb8275d92b9a) )
 
 	DISK_REGION( "cdrom1" ) // video CD
@@ -1576,7 +1558,7 @@ ROM_START( bmiidxa )
 	ROM_REGION( 0x224, "security", 0 )
 	ROM_LOAD( "863a02", 0x000000, 0x000224, BAD_DUMP CRC(078be99f) SHA1(7def88d18a9250a8e4b54a51bf663161676cd9be) )
 
-	DISK_REGION( "scsi:4:cdrom" ) // program
+	DISK_REGION( "cdrom" ) // program
 	DISK_IMAGE_READONLY( "gq863a01", 0, SHA1(07fc467f6500504729becbaf77dabc093a134e65) )
 
 	DISK_REGION( "cdrom1" ) // video CD
@@ -1592,7 +1574,7 @@ ROM_START( bmiidx2 )
 	ROM_REGION( 0x100, "security", 0 )
 	ROM_LOAD( "985a02", 0x000000, 0x000100, CRC(059c1f99) SHA1(f094a12c9a56d351667746a765804c94cb3f96bb) )
 
-	DISK_REGION( "scsi:4:cdrom" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "gc985a01", 0, SHA1(0b783f11317f64552ebf3323459139529e7f315f) )
 
 	DISK_REGION( "cdrom1" ) // video CD
@@ -1608,7 +1590,7 @@ ROM_START( bmiidx3 )
 	ROM_REGION( 0x100, "security", 0 )
 	ROM_LOAD( "992a02", 0x000000, 0x000100, CRC(92520992) SHA1(c4a47dd0e805807df0f086fd9602c000fe2baa61) )
 
-	DISK_REGION( "scsi:4:cdrom" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "gc992-jac01", 0, SHA1(c02d6e58439be678ec0d7171eae2dfd53a21acc7) )
 
 	DISK_REGION( "cdrom1" ) // video CD
@@ -1624,7 +1606,7 @@ ROM_START( bmiidx3b )
 	ROM_REGION( 0x100, "security", 0 )
 	ROM_LOAD( "992a02", 0x000000, 0x000100, CRC(92520992) SHA1(c4a47dd0e805807df0f086fd9602c000fe2baa61) )
 
-	DISK_REGION( "scsi:4:cdrom" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "gc992-jab01", 0, SHA1(7a5bc08e5723c2705fb7954a8bb727f96514ec2e) )
 
 	DISK_REGION( "cdrom1" ) // video CD
@@ -1640,7 +1622,7 @@ ROM_START( bmiidx3a )
 	ROM_REGION( 0x100, "security", 0 )
 	ROM_LOAD( "992a02", 0x000000, 0x000100, CRC(92520992) SHA1(c4a47dd0e805807df0f086fd9602c000fe2baa61) )
 
-	DISK_REGION( "scsi:4:cdrom" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "gc992-jaa01", 0, SHA1(d86dab5c8130859e73a3e2936b7fd6231e1c025d) )
 
 	DISK_REGION( "cdrom1" ) // video CD
@@ -1656,7 +1638,7 @@ ROM_START( bmiidx4 )
 	ROM_REGION( 0x100, "security", 0 )
 	ROM_LOAD( "a03", 0x000000, 0x000100, CRC(9ccf71f9) SHA1(01c4060ac6e2cdc156c034797ea2e305cbbc31ef) )
 
-	DISK_REGION( "scsi:4:cdrom" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "a03jaa01", 0, SHA1(f54fc778c2187ccd950402a159babef956b71492) )
 
 	DISK_REGION( "cdrom1" ) // video CD
@@ -1672,7 +1654,7 @@ ROM_START( bmiidx5 )
 	ROM_REGION( 0x100, "security", 0 )
 	ROM_LOAD( "a17", 0x000000, 0x000100, CRC(70ae9983) SHA1(de0b9ce8ca09e794a35722737958fa7ee6eef6ce) )
 
-	DISK_REGION( "scsi:4:cdrom" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "a17jaa01", 0, SHA1(5ac46973b42b2c66ae63297d1a7fd69b33ef4d1d) )
 
 	DISK_REGION( "cdrom1" ) // video CD
@@ -1688,7 +1670,7 @@ ROM_START( bmiidx6 )
 	ROM_REGION( 0x100, "security", 0 )
 	ROM_LOAD( "b4u", 0x000000, 0x000100, CRC(5c134715) SHA1(2bc40388c5e2d54e99e9fdfd63216820b5c939c0) )
 
-	DISK_REGION( "scsi:4:cdrom" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "b4ujab01", 0, SHA1(aaae77f473c4a44ce6838da3ef6dab27e4afa0e4) )
 
 	DISK_REGION( "cdrom1" ) // DVD
@@ -1704,7 +1686,7 @@ ROM_START( bmiidx6a )
 	ROM_REGION( 0x100, "security", 0 )
 	ROM_LOAD( "b4u", 0x000000, 0x000100, CRC(5c134715) SHA1(2bc40388c5e2d54e99e9fdfd63216820b5c939c0) )
 
-	DISK_REGION( "scsi:4:cdrom" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "b4ujaa01", 0, SHA1(22589f2a2b421e910d8dc3d98b375d7939a94921) )
 
 	DISK_REGION( "cdrom1" ) // DVD
@@ -1720,7 +1702,7 @@ ROM_START( bmiidx7 )
 	ROM_REGION( 0x100, "security", 0 )
 	ROM_LOAD( "b44", 0x000000, 0x000100, CRC(fb6aaa40) SHA1(7a93a8b69d71c2e448d176a6a9d175a01bd8a5f1) )
 
-	DISK_REGION( "scsi:4:cdrom" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "b44jab01", 0, SHA1(f04411b2c7a671dc9544635b187db7a5f3eae6aa) )
 
 	DISK_REGION( "cdrom1" ) // DVD
@@ -1736,7 +1718,7 @@ ROM_START( bmiidx7a )
 	ROM_REGION( 0x100, "security", 0 )
 	ROM_LOAD( "b44", 0x000000, 0x000100, CRC(fb6aaa40) SHA1(7a93a8b69d71c2e448d176a6a9d175a01bd8a5f1) )
 
-	DISK_REGION( "scsi:4:cdrom" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "b44jaa01", 0, SHA1(57fb0312d8102e959658e48a97e46aa16e592b60) )
 
 	DISK_REGION( "cdrom1" ) // DVD
@@ -1752,7 +1734,7 @@ ROM_START( bmiidx8 )
 	ROM_REGION( 0x100, "security", 0 )
 	ROM_LOAD( "c44", 0x000000, 0x000100, CRC(3afc8048) SHA1(36cf01288a5ca4f03060de44a89472650e9f8dcc) )
 
-	DISK_REGION( "scsi:4:cdrom" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "c44jaa01", 0, SHA1(dd2aeb925182ed75ade510ca3a0f913d667a2be2) )
 
 	DISK_REGION( "cdrom1" ) // DVD
@@ -1768,7 +1750,7 @@ ROM_START( bmiidxc )
 	ROM_REGION( 0x224, "security", 0 )
 	ROM_LOAD( "863a02", 0x000000, 0x000224, BAD_DUMP CRC(078be99f) SHA1(7def88d18a9250a8e4b54a51bf663161676cd9be) )
 
-	DISK_REGION( "scsi:4:cdrom" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "896jabbm", 0, SHA1(09fb638bc5b3e64af13ae3df66ba25e490440946) )
 
 	DISK_REGION( "cdrom1" ) // video CD, same as bmiidx
@@ -1784,7 +1766,7 @@ ROM_START( bmiidxca )
 	ROM_REGION( 0x224, "security", 0 )
 	ROM_LOAD( "863a02", 0x000000, 0x000224, BAD_DUMP CRC(078be99f) SHA1(7def88d18a9250a8e4b54a51bf663161676cd9be) )
 
-	DISK_REGION( "scsi:4:cdrom" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "896jaabm", 0, SHA1(ea7205f86543d9273efcc226666ab530c32b23c1) )
 
 	DISK_REGION( "cdrom1" ) // video CD, same as bmiidx
@@ -1800,7 +1782,7 @@ ROM_START( bmiidxs )
 	ROM_REGION( 0x224, "security", 0 )
 	ROM_LOAD( "983a02", 0x000000, 0x000224, BAD_DUMP CRC(6a6ace82) SHA1(1e1373f40c469c117316c03db414d9984567dd42) )
 
-	DISK_REGION( "scsi:4:cdrom" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "gc983a01", 0, SHA1(7a80380f9c18c7da9643e0b9954ad8367eda5948) )
 
 	DISK_REGION( "cdrom1" ) // video CD
@@ -1816,7 +1798,7 @@ ROM_START( bmiidxsa )
 	ROM_REGION( 0x224, "security", 0 )
 	ROM_LOAD( "983aa02", 0x000000, 0x000224, BAD_DUMP CRC(bcc8965c) SHA1(e152d19a92544212e321a332c6e6678d623dab21) )
 
-	DISK_REGION( "scsi:4:cdrom" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "gc983aa,a01", 0, SHA1(9ef5725fc79a7f4f524ef93849af42b2758102cd) )
 
 	DISK_REGION( "cdrom1" ) // video CD
@@ -1832,7 +1814,7 @@ ROM_START( bmiidxc2 )
 	ROM_REGION( 0x224, "security", 0 )
 	ROM_LOAD( "984a02", 0x000000, 0x000224, BAD_DUMP CRC(786db814) SHA1(722c709d95d54cd519856ddea64b9176ef191b0d) )
 
-	DISK_REGION( "scsi:4:cdrom" )
+	DISK_REGION( "cdrom" )
 	DISK_IMAGE_READONLY( "ge984a01,bm", 0, SHA1(03b083ba09652dfab6f328000c3c9de2a7a4e618) )
 
 	DISK_REGION( "cdrom1" ) // video CD, same as bmiidxs

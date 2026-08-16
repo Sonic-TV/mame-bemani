@@ -110,7 +110,7 @@
 #include "emu.h"
 #include "deco_mlc.h"
 
-#include "deco156_m.h"
+#include "deco156.h"
 #include "machine/eepromser.h"
 #include "cpu/arm/arm.h"
 #include "cpu/sh/sh7604.h"
@@ -547,7 +547,7 @@ void deco_mlc_state::avengrgs(machine_config &config)
 	TIMER(config, m_raster_irq_timer).configure_generic(FUNC(deco_mlc_state::interrupt_gen));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(58);
 	m_screen->set_size(40*8, 32*8);
 	m_screen->set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
@@ -560,12 +560,11 @@ void deco_mlc_state::avengrgs(machine_config &config)
 	m_palette->set_membits(16);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	YMZ280B(config, m_ymz, 42000000 / 3);
-	m_ymz->add_route(0, "lspeaker", 1.0);
-	m_ymz->add_route(1, "rspeaker", 1.0);
+	m_ymz->add_route(0, "speaker", 1.0, 0);
+	m_ymz->add_route(1, "speaker", 1.0, 1);
 }
 
 void deco_mlc_state::mlc(machine_config &config)
@@ -579,7 +578,7 @@ void deco_mlc_state::mlc(machine_config &config)
 	TIMER(config, m_raster_irq_timer).configure_generic(FUNC(deco_mlc_state::interrupt_gen));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(58);
 	m_screen->set_size(40*8, 32*8);
 	m_screen->set_visarea(0*8, 40*8-1, 1*8, 31*8-1);
@@ -592,12 +591,11 @@ void deco_mlc_state::mlc(machine_config &config)
 	m_palette->set_membits(16);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	YMZ280B(config, m_ymz, 42000000 / 3);
-	m_ymz->add_route(0, "lspeaker", 1.0);
-	m_ymz->add_route(1, "rspeaker", 1.0);
+	m_ymz->add_route(0, "speaker", 1.0, 0);
+	m_ymz->add_route(1, "speaker", 1.0, 1);
 }
 
 void deco_mlc_state::mlc_6bpp(machine_config &config)
@@ -614,8 +612,8 @@ void deco_mlc_state::mlc_5bpp(machine_config &config)
 	m_gfxdecode->set_info(gfx_5bpp);
 
 	// TODO: mono? ch.0 doesn't output any sound in-game
-	m_ymz->add_route(1, "lspeaker", 1.0);
-	m_ymz->add_route(0, "rspeaker", 1.0);
+	m_ymz->add_route(1, "speaker", 1.0, 0);
+	m_ymz->add_route(0, "speaker", 1.0, 1);
 }
 
 void deco_mlc_state::stadhr96(machine_config &config)
@@ -624,7 +622,7 @@ void deco_mlc_state::stadhr96(machine_config &config)
 
 	m_maincpu->set_addrmap(AS_PROGRAM, &deco_mlc_state::decomlc_146_map);
 
-	DECO146PROT(config, m_deco146, 0);
+	DECO146PROT(config, m_deco146);
 	m_deco146->set_use_magic_read_address_xor(true);
 }
 

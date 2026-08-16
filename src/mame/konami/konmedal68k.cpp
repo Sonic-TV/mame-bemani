@@ -376,7 +376,7 @@ static INPUT_PORTS_START( kzaurus )
 
 	PORT_START("DSW")
 	PORT_DIPNAME( 0x07, 0x07, "Coin Slot 1" )   PORT_DIPLOCATION("SW1:1,2,3")
-	PORT_DIPSETTING(    0x00, "5 Coins/2 Credits" )
+	PORT_DIPSETTING(    0x00, DEF_STR( 5C_2C ) )
 	PORT_DIPSETTING(    0x01, DEF_STR( 4C_3C ) )
 	PORT_DIPSETTING(    0x02, DEF_STR( 2C_3C ) )
 	PORT_DIPSETTING(    0x03, DEF_STR( 5C_1C ) )
@@ -430,7 +430,7 @@ static INPUT_PORTS_START( kzaurus )
 	PORT_DIPNAME( 0x4000, 0x0000, "Backup Memory" )      PORT_DIPLOCATION("SW2:7")
 	PORT_DIPSETTING(    0x4000, "Keep" )
 	PORT_DIPSETTING(    0x0000, "Clear" )
-	PORT_DIPNAME( 0x8000, 0x0000, "Demo Sound" )         PORT_DIPLOCATION("SW2:8")
+	PORT_DIPNAME( 0x8000, 0x0000, DEF_STR( Demo_Sounds ) )         PORT_DIPLOCATION("SW2:8")  // "Demo Sound"
 	PORT_DIPSETTING(    0x8000, DEF_STR( Off ) )
 	PORT_DIPSETTING(    0x0000, DEF_STR( On ) )
 INPUT_PORTS_END
@@ -645,7 +645,7 @@ void konmedal68k_state::kzaurus(machine_config &config)
 	HOPPER(config, "hopper", attotime::from_msec(100));
 
 	/* video hardware */
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_refresh_hz(59.62);  /* verified on pcb */
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	m_screen->set_size(64*8, 32*8);
@@ -659,15 +659,14 @@ void konmedal68k_state::kzaurus(machine_config &config)
 	m_k056832->set_config(K056832_BPP_4dj, 1, 0);
 	m_k056832->set_palette(m_palette);
 
-	K055555(config, m_k055555, 0);
+	K055555(config, m_k055555);
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	YMZ280B(config, m_ymz, XTAL(33'868'800)/2); // 33.8688 MHz xtal verified on PCB
-	m_ymz->add_route(0, "lspeaker", 0.75);
-	m_ymz->add_route(1, "rspeaker", 0.75);
+	m_ymz->add_route(0, "speaker", 0.75, 0);
+	m_ymz->add_route(1, "speaker", 0.75, 1);
 }
 
 void konmedal68k_state::koropens(machine_config &config)
@@ -701,7 +700,7 @@ void konmedal68k_state::gs662(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &konmedal68k_state::gs662_main);
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config.replace(), "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config.replace(), "screen"));
 	screen.set_refresh_hz(59.62); /* verified on pcb */
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64 * 8, 32 * 8);

@@ -11,7 +11,7 @@
 
 #pragma once
 
-#include "sound/samples.h"
+#include "sound/drivesound.h"
 
 // forward declarations
 class floppy_image;
@@ -21,8 +21,6 @@ namespace fs {
 	class manager_t;
 	class meta_data;
 };
-
-class floppy_sound_device;
 
 /***************************************************************************
     TYPE DEFINITIONS
@@ -157,9 +155,6 @@ public:
 	static void default_mfm_floppy_formats(format_registration &fr);
 	static void default_pc_floppy_formats(format_registration &fr);
 
-	// Enable sound
-	void    enable_sound(bool doit) { m_make_sound = doit; }
-
 protected:
 	struct fs_enum;
 
@@ -273,9 +268,10 @@ protected:
 	void cache_fill(const attotime &when);
 	void cache_weakness_setup();
 
-	// Sound
-	bool    m_make_sound;
-	floppy_sound_device* m_sound_out;
+	// Sound support
+	bool m_make_sound;
+	const floppy_sound_samples *m_samples;
+	required_device<floppy_sound_device> m_sound_out;
 };
 
 #define DECLARE_FLOPPY_IMAGE_DEVICE(Type, Name, Interface) \
@@ -294,6 +290,7 @@ DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_3_DSSD,       floppy_3_dssd,       "floppy_3"
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_3_SSDD,       floppy_3_ssdd,       "floppy_3")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_3_DSDD,       floppy_3_dsdd,       "floppy_3")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_3_DSQD,       floppy_3_dsqd,       "floppy_3")
+DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_35_SSSD,      floppy_35_sssd,      "floppy_3_5")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_35_SSDD,      floppy_35_ssdd,      "floppy_3_5")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_35_DD,        floppy_35_dd,        "floppy_3_5")
 DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_35_HD,        floppy_35_hd,        "floppy_3_5")
@@ -316,6 +313,7 @@ DECLARE_FLOPPY_IMAGE_DEVICE(EPSON_SMD_165,       epson_smd_165,       "floppy_3_
 DECLARE_FLOPPY_IMAGE_DEVICE(EPSON_SD_320,        epson_sd_320,        "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(EPSON_SD_321,        epson_sd_321,        "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(PANA_JU_363,         pana_ju_363,         "floppy_3_5")
+DECLARE_FLOPPY_IMAGE_DEVICE(PANA_JU_386,         pana_ju_386,         "floppy_3_5")
 DECLARE_FLOPPY_IMAGE_DEVICE(SONY_OA_D31V,        sony_oa_d31v,        "floppy_3_5")
 DECLARE_FLOPPY_IMAGE_DEVICE(SONY_OA_D32W,        sony_oa_d32w,        "floppy_3_5")
 DECLARE_FLOPPY_IMAGE_DEVICE(SONY_OA_D32V,        sony_oa_d32v,        "floppy_3_5")
@@ -327,8 +325,7 @@ DECLARE_FLOPPY_IMAGE_DEVICE(TEAC_FD_55F,         teac_fd_55f,         "floppy_5_
 DECLARE_FLOPPY_IMAGE_DEVICE(TEAC_FD_55G,         teac_fd_55g,         "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(ALPS_3255190X,       alps_3255190x,       "floppy_5_25")
 DECLARE_FLOPPY_IMAGE_DEVICE(IBM_6360,            ibm_6360,            "floppy_8")
-
-DECLARE_DEVICE_TYPE(FLOPPYSOUND, floppy_sound_device)
+DECLARE_FLOPPY_IMAGE_DEVICE(FLOPPY_TWIGGY,       floppy_twiggy,       "floppy_twiggy")
 
 class mac_floppy_device : public floppy_image_device {
 public:
@@ -394,46 +391,6 @@ DECLARE_DEVICE_TYPE(OAD34V, oa_d34v_device)
 DECLARE_DEVICE_TYPE(MFD51W, mfd51w_device)
 DECLARE_DEVICE_TYPE(MFD75W, mfd75w_device)
 
-
-/*
-    Floppy drive sound
-*/
-
-class floppy_sound_device : public samples_device
-{
-public:
-	floppy_sound_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
-	void motor(bool on, bool withdisk);
-	void step(int track);
-	bool samples_loaded() { return m_loaded; }
-	void register_for_save_states();
-
-protected:
-	void device_start() override ATTR_COLD;
-
-private:
-	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
-	sound_stream*   m_sound;
-
-	int         m_step_base;
-	int         m_spin_samples;
-	int         m_step_samples;
-	int         m_spin_samplepos;
-	int         m_step_samplepos;
-	int         m_seek_sound_timeout;
-	int         m_zones;
-	int         m_spin_playback_sample;
-	int         m_step_playback_sample;
-	int         m_seek_playback_sample;
-	bool        m_motor_on;
-	bool        m_with_disk;
-	bool        m_loaded;
-	double      m_seek_pitch;
-	double      m_seek_samplepos;
-};
-
-
 class floppy_connector: public device_t,
 						public device_slot_interface
 {
@@ -443,10 +400,7 @@ public:
 	floppy_connector(const machine_config &mconfig, const char *tag, device_t *owner, T &&opts, const char *dflt, U &&formats, bool fixed = false)
 		: floppy_connector(mconfig, tag, owner, 0)
 	{
-		option_reset();
-		opts(*this);
-		set_default_option(dflt);
-		set_fixed(fixed);
+		set_options(std::forward<T>(opts), dflt, fixed);
 		set_formats(std::forward<U>(formats));
 	}
 
@@ -466,10 +420,16 @@ public:
 	virtual ~floppy_connector();
 
 	template <typename T> void set_formats(T &&_formats) { formats = std::forward<T>(_formats); }
-	void enable_sound(bool doit) { m_enable_sound = doit; }
+
 	void set_sectoring_type(uint32_t sectoring_type) { m_sectoring_type = sectoring_type; }
 
 	floppy_image_device *get_device();
+
+	// Sound support
+	bool use_sound() { return m_use_sound; }
+	void enable_sound(bool doit = true);
+	void enable_sound(floppy_sound_samples *samples);
+	floppy_sound_samples *get_samples() { return m_samples; }
 
 protected:
 	virtual void device_start() override ATTR_COLD;
@@ -477,7 +437,10 @@ protected:
 
 private:
 	std::function<void (format_registration &fr)> formats;
-	bool m_enable_sound;
+
+	bool m_use_sound;
+	floppy_sound_samples *m_samples;
+
 	uint32_t m_sectoring_type;
 };
 

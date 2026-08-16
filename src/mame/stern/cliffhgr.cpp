@@ -236,7 +236,6 @@ TIMER_CALLBACK_MEMBER(cliffhgr_state::irq_callback)
 
 void cliffhgr_state::machine_start()
 {
-	m_led.resolve();
 	m_irq_timer = timer_alloc(FUNC(cliffhgr_state::irq_callback), this);
 
 	save_item(NAME(m_port_bank));
@@ -700,11 +699,11 @@ void cliffhgr_state::cliffhgr(machine_config &config)
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_0);
 
-	PIONEER_PR8210(config, m_laserdisc, 0);
+	PIONEER_PR8210(config, m_laserdisc);
 	m_laserdisc->set_overlay(tms9928a_device::TOTAL_HORZ, tms9928a_device::TOTAL_VERT_NTSC, "tms9928a", FUNC(tms9928a_device::screen_update));
 	m_laserdisc->set_overlay_clip(tms9928a_device::HORZ_DISPLAY_START-12, tms9928a_device::HORZ_DISPLAY_START+32*8+12-1, tms9928a_device::VERT_DISPLAY_START_NTSC - 12, tms9928a_device::VERT_DISPLAY_START_NTSC+24*8+12-1);
-	m_laserdisc->add_route(0, "lspeaker", 1.0);
-	m_laserdisc->add_route(1, "rspeaker", 1.0);
+	m_laserdisc->add_route(0, "speaker", 1.0, 0);
+	m_laserdisc->add_route(1, "speaker", 1.0, 1);
 
 	/* start with the TMS9928a video configuration */
 	tms9128_device &vdp(TMS9128(config, "tms9928a", XTAL(10'738'635)));   /* TMS9128NL on the board */
@@ -715,10 +714,9 @@ void cliffhgr_state::cliffhgr(machine_config &config)
 	m_laserdisc->add_ntsc_screen(config, "screen");
 
 	/* sound hardware */
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
-	DISCRETE(config, m_discrete, cliffhgr_discrete).add_route(ALL_OUTPUTS, "lspeaker", 1.0);
+	DISCRETE(config, m_discrete, cliffhgr_discrete).add_route(ALL_OUTPUTS, "speaker", 1.0, 0);
 }
 
 

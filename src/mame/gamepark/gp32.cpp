@@ -326,7 +326,7 @@ void gp32_state::s3c240x_lcd_configure()
 	LOGMASKED(LOG_VRAM, "LCD - framerate %f\n", framerate);
 	visarea.set(0, hozval, 0, lineval);
 	LOGMASKED(LOG_VRAM, "LCD - visarea min_x %d min_y %d max_x %d max_y %d\n", visarea.min_x, visarea.min_y, visarea.max_x, visarea.max_y);
-	m_screen->configure(hozval + 1, lineval + 1, visarea, HZ_TO_ATTOSECONDS( framerate));
+	m_screen->configure(hozval + 1, lineval + 1, visarea, attotime::from_hz(framerate));
 }
 
 void gp32_state::s3c240x_lcd_start()
@@ -1687,7 +1687,7 @@ void gp32_state::gp32(machine_config &config)
 
 	PALETTE(config, m_palette).set_entries(32768);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(60);
 	m_screen->set_vblank_time(ATTOSECONDS_IN_USEC(2500)); /* not accurate */
 	// TODO: bad setup that theoretically should fail a validation check plus console doesn't have vertical screen anyway
@@ -1696,14 +1696,13 @@ void gp32_state::gp32(machine_config &config)
 	m_screen->set_visarea(0, 239, 0, 319);
 	m_screen->set_screen_update(FUNC(gp32_state::screen_update_gp32));
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0).add_route(ALL_OUTPUTS, "lspeaker", 1.0); // unknown DAC
-	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "rspeaker", 1.0); // unknown DAC
+	SPEAKER(config, "speaker", 2).front();
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_ldac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 0); // unknown DAC
+	DAC_16BIT_R2R_TWOS_COMPLEMENT(config, m_rdac, 0).add_route(ALL_OUTPUTS, "speaker", 1.0, 1); // unknown DAC
 
 	NVRAM(config, "nvram", nvram_device::DEFAULT_ALL_1);
 
-	SMARTMEDIA(config, m_smartmedia, 0);
+	SMARTMEDIA(config, m_smartmedia);
 
 	SOFTWARE_LIST(config, "memc_list").set_original("gp32");
 }

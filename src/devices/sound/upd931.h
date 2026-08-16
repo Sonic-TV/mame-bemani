@@ -40,7 +40,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 	virtual void device_clock_changed() override;
 
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	static constexpr unsigned PITCH_SHIFT = 15;
@@ -113,6 +113,7 @@ private:
 
 	void note_on(voice_t &voice);
 	void reset_timer();
+	void update_pitch(voice_t &voice);
 	void update_env(voice_t &voice);
 	void update_wave(voice_t &voice);
 

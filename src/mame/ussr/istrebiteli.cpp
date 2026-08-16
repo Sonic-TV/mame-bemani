@@ -51,7 +51,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 
 	// device_sound_interface overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	// internal state
@@ -97,11 +97,9 @@ void istrebiteli_sound_device::device_start()
 	save_item(NAME(m_prev_data));
 }
 
-void istrebiteli_sound_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void istrebiteli_sound_device::sound_stream_update(sound_stream &stream)
 {
-	auto &buffer = outputs[0];
-
-	for (int sampindex = 0; sampindex < buffer.samples(); sampindex++)
+	for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 	{
 		int smpl = 0;
 		if (m_rom_out_en)
@@ -112,7 +110,7 @@ void istrebiteli_sound_device::sound_stream_update(sound_stream &stream, std::ve
 			smpl &= machine().rand() & 1;
 		smpl *= (m_prev_data & 0x80) ? 1000 : 4000; // b7 volume ?
 
-		buffer.put_int(sampindex, smpl, 32768);
+		stream.put_int(0, sampindex, smpl, 32768);
 		m_rom_cnt = (m_rom_cnt + m_rom_incr) & 0x1ff;
 	}
 }
@@ -617,7 +615,7 @@ void istrebiteli_state::istreb(machine_config &config)
 	ppi1.in_pc_callback().set_ioport("IN2");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(8'000'000) / 2, 256, 64, 256, 312, 0, 256);
 	screen.set_screen_update(FUNC(istrebiteli_state::screen_update));
 	screen.set_palette("palette");
@@ -647,7 +645,7 @@ void istrebiteli_state::motogonki(machine_config &config)
 	ppi1.in_pc_callback().set_ioport("IN1");
 
 	/* video hardware */
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_raw(XTAL(8'000'000) / 2, 256, 64, 256, 312, 0, 256);
 	screen.set_screen_update(FUNC(istrebiteli_state::moto_screen_update));
 	screen.set_palette("palette");

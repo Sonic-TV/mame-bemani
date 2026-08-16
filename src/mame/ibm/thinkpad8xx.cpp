@@ -36,7 +36,7 @@ Hardware for the 850 model:
 -Intel S82378ZB PCIset.
 -National Semiconductor DP87322VF (SuperI/O III, Floppy Disk Controller with Dual UARTs,
  Enhanced Parallel Port, and IDE Interface).
--Motorola XPC105ARX66CD (PowerPC PCI Bridge/Memory Controller).
+-Motorola XPC105ARX66CD (PowerPC PCI Bridge/Memory Controller MPC105).
 -Other ICs: S-MOS 85G7814, S-MOS 85G2680
 
 More info: http://oldcomputer.info/portables/tp850/ibm_ppc_thinkpad_redbook.pdf
@@ -60,13 +60,19 @@ public:
 		, m_maincpu(*this, "maincpu")
 	{ }
 
-
 	void thinkpad850(machine_config &config);
 
 private:
 	required_device<cpu_device> m_maincpu;
+
+	void main_map(address_map &map) ATTR_COLD;
 };
 
+
+void thinkpad8xx_state::main_map(address_map &map)
+{
+	map(0xfff00000, 0xfff7ffff).rom().region("maincpu", 0);
+}
 
 static INPUT_PORTS_START(thinkpad8xx)
 INPUT_PORTS_END
@@ -74,19 +80,20 @@ INPUT_PORTS_END
 void thinkpad8xx_state::thinkpad850(machine_config &config)
 {
 	PPC603(config, m_maincpu, 33.333_MHz_XTAL * 3); // IBM PPCI603eFC100BPQ
+	m_maincpu->set_addrmap(AS_PROGRAM, &thinkpad8xx_state::main_map);
 
 	// All BIOS ROM chip lines are routed through the S-MOS 85G7814
 
 	H8325(config, "mcu", XTAL(10'000'000)); // Actually an H8/338 (HD6473388: 48k-byte ROM; 2k-byte RAM), unknown clock
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	SOFTWARE_LIST(config, "thinkpad8xx").set_original("thinkpad8xx");
+	SOFTWARE_LIST(config, "win_cdrom_list").set_original("generic_cdrom").set_filter("prep");
 }
 
 
-ROM_START(thinkpad850)
+ROM_START(tpad850)
 	ROM_DEFAULT_BIOS("v101")
 	ROM_SYSTEM_BIOS( 0, "v100", "v1.00 (91G0610, 07-03-1995)" )
 	ROM_SYSTEM_BIOS( 1, "v101", "v1.01 (91G1671, 09-10-1996)" )
@@ -101,5 +108,5 @@ ROM_END
 
 } // anonymous namespace
 
-//    YEAR, NAME,        PARENT, COMPAT, MACHINE,     INPUT,       CLASS,             INIT,       COMPANY, FULLNAME,       FLAGS
-COMP( 1996, thinkpad850, 0,      0,      thinkpad850, thinkpad8xx, thinkpad8xx_state, empty_init, "IBM",   "ThinkPad 850", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )
+//    YEAR, NAME,    PARENT, COMPAT, MACHINE,     INPUT,       CLASS,             INIT,       COMPANY, FULLNAME,       FLAGS
+COMP( 1996, tpad850, 0,      0,      thinkpad850, thinkpad8xx, thinkpad8xx_state, empty_init, "IBM",   "ThinkPad 850", MACHINE_NO_SOUND | MACHINE_NOT_WORKING )

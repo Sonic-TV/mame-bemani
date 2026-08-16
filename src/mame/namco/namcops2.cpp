@@ -26,11 +26,13 @@ Games on System 246/256/S256 include.....
                                                                                Media Type             Game ID &
 Name from title screen                           System   Media ID            (HDD/CD/DVD)  Cart ID   Revision               Company/Year                  Notes
 -------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-Battle Gear 3 (Japan)........................... XX34XXX  M9005793A VER.2.04J  HDD (20GB)   NM00010   B3900065A              Taito 2002                    \  HDD: Western Digital WD200EB
-Battle Gear 3 (Export).......................... XX34XXX  M9005793A VER.2.04J  HDD (20GB)   NM00010  *B3900068A(?)           Taito 2002                     | All require Taito JVS Universal I/O board K91X0951A otherwise no boot-up; dongle selects region using same HDDs
+Battle Gear 3 (Japan)........................... XX34XXX  M9005793A VER.2.04J  HDD (20GB)   NM00010   B3900065A              Taito 2002                    \  HDD: Western Digital WD200EB; all require Taito JVS Universal I/O board K91X0951A otherwise no boot-up
+Battle Gear 3 (Export).......................... XX34XXX  M9005793A VER.2.04J  HDD (20GB)   NM00010  *B3900065B/C(?)         Taito 2002                     | Dongle selects region (J/O) using same HDDs
+Battle Gear 3 (Export, Offline)................. XX34XXX  M900????A VER.2.0xE? HDD (20GB)   NM00010? *B3900071A              Taito 2002                     | No online service (NESYS) support, instead having local leaderboards
 Battle Gear 3 (US).............................. ------X  M9005951A VER.2.00A  HDD (30GB)   NM00010?  B3900068A              Taito 2002                     | 2004 Betson release; contrary to flyer, does *not* remove Honda cars (contrast sidebs2u/batlgear)
 Battle Gear 3 Tuned (Japan)..................... XX34XXX  M9006066A VER.2.03J  HDD (30GB)   NM00015  *B3900074B              Taito 2003                     | HDD: Maxtor Fireball 3 30GB 2F030L0
-Battle Gear 3 Tuned (Export).................... XX34XXX  M9006066A VER.2.03J  HDD (30GB)   NM00015   B3900074C              Taito 2003                    /
+Battle Gear 3 Tuned (Export).................... XX34XXX  M9006066A VER.2.03J  HDD (30GB)   NM00015   B3900074C              Taito 2003                     |
+Battle Gear 3 Tuned (Hong Kong)................. ------X  M9006543A VER.2.00C  HDD (40GB)   NM00015   B3900077A              Taito 2003                    /  HDD: Western Digital WD400EB; different online server (also the case for US version of BG3 on top of Honda issue)
 Bloody Roar 3................................... 1234XXX  BRT1-A               CD           NM00002   BRT1 Ver.A             Namco/8ing/Raizing 2000
 Capcom Fighting Jam/Capcom Fighting Evolution... XXXX56X  JAM1 DVD0            DVD          NM00018   JAM1 Ver.A             Capcom 2004
 Cobra The Arcade................................ XXXX56X  CBR1-HA              HDD (40GB)   NM00021   CBR1 Ver.B             Namco 2004                    Requires RAYS I/O PCB and IR guns and IR sensors. HDD: Maxtor DiamondMax Plus 8 40GB 6E040L0
@@ -943,7 +945,7 @@ void namcops2_state::system246(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &namcops2_state::ps2_map);
 
 	// video hardware
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_screen_update(FUNC(namcops2_state::screen_update));
 	screen.set_size(640, 480);

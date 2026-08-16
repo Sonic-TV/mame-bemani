@@ -1068,7 +1068,7 @@ void arm7_cpu_device::device_start()
 
 	state_add(STATE_GENFLAGS, "GENFLAGS", m_r[eCPSR]).formatstr("%13s").noshow();
 
-	if (machine().debug_flags & DEBUG_FLAG_ENABLED)
+	if (debugger_enabled())
 	{
 		using namespace std::placeholders;
 		machine().debugger().console().register_command("translate_insn", CMDFLAG_NONE, 1, 1, std::bind(&arm7_cpu_device::translate_insn_command, this, _1));
@@ -1150,8 +1150,6 @@ void arm7_cpu_device::device_reset()
 	m_r[eCPSR] = I_MASK | F_MASK | 0x10;
 	SwitchMode(eARM7_MODE_SVC);
 	m_r[eR15] = 0 | m_vectorbase;
-
-	m_impstate.cache_dirty = true;
 
 	for (auto &entry : m_dtlb_entries)
 	{
@@ -2106,7 +2104,7 @@ void arm946es_cpu_device::RefreshITCM()
 	}
 }
 
-void arm946es_cpu_device::arm7_cpu_write32(uint32_t addr, uint32_t data)
+void arm946es_cpu_device::arm7_cpu_write32(offs_t addr, uint32_t data)
 {
 	addr &= ~3;
 
@@ -2127,7 +2125,7 @@ void arm946es_cpu_device::arm7_cpu_write32(uint32_t addr, uint32_t data)
 }
 
 
-void arm946es_cpu_device::arm7_cpu_write16(uint32_t addr, uint16_t data)
+void arm946es_cpu_device::arm7_cpu_write16(offs_t addr, uint16_t data)
 {
 	addr &= ~1;
 	if ((addr >= cp15_itcm_base) && (addr <= cp15_itcm_end))
@@ -2146,7 +2144,7 @@ void arm946es_cpu_device::arm7_cpu_write16(uint32_t addr, uint16_t data)
 	m_program->write_word(addr, data);
 }
 
-void arm946es_cpu_device::arm7_cpu_write8(uint32_t addr, uint8_t data)
+void arm946es_cpu_device::arm7_cpu_write8(offs_t addr, uint8_t data)
 {
 	if ((addr >= cp15_itcm_base) && (addr <= cp15_itcm_end))
 	{
@@ -2162,7 +2160,7 @@ void arm946es_cpu_device::arm7_cpu_write8(uint32_t addr, uint8_t data)
 	m_program->write_byte(addr, data);
 }
 
-uint32_t arm946es_cpu_device::arm7_cpu_read32(uint32_t addr)
+uint32_t arm946es_cpu_device::arm7_cpu_read32(offs_t addr)
 {
 	uint32_t result;
 
@@ -2171,7 +2169,7 @@ uint32_t arm946es_cpu_device::arm7_cpu_read32(uint32_t addr)
 		if (addr & 3)
 		{
 			uint32_t *wp = (uint32_t *)&ITCM[(addr & ~3)&0x7fff];
-			result = rotr_32(*wp, 8 * (addr & 3));
+			result = std::rotr(*wp, 8 * (addr & 3));
 		}
 		else
 		{
@@ -2184,7 +2182,7 @@ uint32_t arm946es_cpu_device::arm7_cpu_read32(uint32_t addr)
 		if (addr & 3)
 		{
 			uint32_t *wp = (uint32_t *)&DTCM[(addr & ~3)&0x3fff];
-			result = rotr_32(*wp, 8 * (addr & 3));
+			result = std::rotr(*wp, 8 * (addr & 3));
 		}
 		else
 		{
@@ -2196,7 +2194,7 @@ uint32_t arm946es_cpu_device::arm7_cpu_read32(uint32_t addr)
 	{
 		if (addr & 3)
 		{
-			result = rotr_32(m_program->read_dword(addr & ~3), 8 * (addr & 3));
+			result = std::rotr(m_program->read_dword(addr & ~3), 8 * (addr & 3));
 		}
 		else
 		{
@@ -2206,7 +2204,7 @@ uint32_t arm946es_cpu_device::arm7_cpu_read32(uint32_t addr)
 	return result;
 }
 
-uint32_t arm946es_cpu_device::arm7_cpu_read16(uint32_t addr)
+uint32_t arm946es_cpu_device::arm7_cpu_read16(offs_t addr)
 {
 	addr &= ~1;
 
@@ -2224,7 +2222,7 @@ uint32_t arm946es_cpu_device::arm7_cpu_read16(uint32_t addr)
 	return m_program->read_word(addr);
 }
 
-uint8_t arm946es_cpu_device::arm7_cpu_read8(uint32_t addr)
+uint8_t arm946es_cpu_device::arm7_cpu_read8(offs_t addr)
 {
 	if ((addr >= cp15_itcm_base) && (addr <= cp15_itcm_end))
 	{
@@ -2310,7 +2308,7 @@ void arm1176jzf_s_cpu_device::arm7_rt_w_callback(offs_t offset, uint32_t data)
 /***************************************************************************
  * Default Memory Handlers
  ***************************************************************************/
-void arm7_cpu_device::arm7_cpu_write32(uint32_t addr, uint32_t data)
+void arm7_cpu_device::arm7_cpu_write32(offs_t addr, uint32_t data)
 {
 	if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
 	{
@@ -2325,7 +2323,7 @@ void arm7_cpu_device::arm7_cpu_write32(uint32_t addr, uint32_t data)
 }
 
 
-void arm7_cpu_device::arm7_cpu_write16(uint32_t addr, uint16_t data)
+void arm7_cpu_device::arm7_cpu_write16(offs_t addr, uint16_t data)
 {
 	if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
 	{
@@ -2339,7 +2337,7 @@ void arm7_cpu_device::arm7_cpu_write16(uint32_t addr, uint16_t data)
 	m_program->write_word(addr, data);
 }
 
-void arm7_cpu_device::arm7_cpu_write8(uint32_t addr, uint8_t data)
+void arm7_cpu_device::arm7_cpu_write8(offs_t addr, uint8_t data)
 {
 	if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
 	{
@@ -2352,7 +2350,7 @@ void arm7_cpu_device::arm7_cpu_write8(uint32_t addr, uint8_t data)
 	m_program->write_byte(addr, data);
 }
 
-uint32_t arm7_cpu_device::arm7_cpu_read32(uint32_t addr)
+uint32_t arm7_cpu_device::arm7_cpu_read32(offs_t addr)
 {
 	uint32_t result;
 
@@ -2366,7 +2364,7 @@ uint32_t arm7_cpu_device::arm7_cpu_read32(uint32_t addr)
 
 	if (addr & 3)
 	{
-		result = rotr_32(m_program->read_dword(addr & ~3), 8 * (addr & 3));
+		result = std::rotr(m_program->read_dword(addr & ~3), 8 * (addr & 3));
 	}
 	else
 	{
@@ -2376,7 +2374,7 @@ uint32_t arm7_cpu_device::arm7_cpu_read32(uint32_t addr)
 	return result;
 }
 
-uint32_t arm7_cpu_device::arm7_cpu_read16(uint32_t addr)
+uint32_t arm7_cpu_device::arm7_cpu_read16(offs_t addr)
 {
 	uint32_t result;
 
@@ -2398,7 +2396,7 @@ uint32_t arm7_cpu_device::arm7_cpu_read16(uint32_t addr)
 	return result;
 }
 
-uint8_t arm7_cpu_device::arm7_cpu_read8(uint32_t addr)
+uint8_t arm7_cpu_device::arm7_cpu_read8(offs_t addr)
 {
 	if( COPRO_CTRL & COPRO_CTRL_MMU_EN )
 	{
@@ -2411,5 +2409,3 @@ uint8_t arm7_cpu_device::arm7_cpu_read8(uint32_t addr)
 	// Handle through normal 8 bit handler (for 32 bit cpu)
 	return m_program->read_byte(addr);
 }
-
-#include "arm7drc.hxx"

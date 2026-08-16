@@ -415,9 +415,6 @@ void dragrace_state::palette(palette_device &palette) const
 
 void dragrace_state::machine_start()
 {
-	m_gear_sel.resolve();
-	m_tacho_sel.resolve();
-
 	m_scan_timer = timer_alloc(FUNC(dragrace_state::scanline_irq), this);
 	m_irq_off_timer = timer_alloc(FUNC(dragrace_state::irq_off), this);
 	m_scan_timer->adjust(m_screen->time_until_pos(64));
@@ -442,7 +439,7 @@ void dragrace_state::dragrace(machine_config &config)
 	TIMER(config, "frame_timer").configure_periodic(FUNC(dragrace_state::frame_callback), attotime::from_hz(60));
 
 	// video hardware
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(12.096_MHz_XTAL / 2, 384, 0, 256, 262, 0, 240); // vertical timings determined by sync PROM
 	m_screen->set_screen_update(FUNC(dragrace_state::screen_update));
 	m_screen->set_palette("palette");
@@ -451,12 +448,11 @@ void dragrace_state::dragrace(machine_config &config)
 	PALETTE(config, "palette", FUNC(dragrace_state::palette), 16);
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	DISCRETE(config, m_discrete, dragrace_discrete);
-	m_discrete->add_route(0, "lspeaker", 1.0);
-	m_discrete->add_route(1, "rspeaker", 1.0);
+	m_discrete->add_route(0, "speaker", 1.0, 0);
+	m_discrete->add_route(1, "speaker", 1.0, 1);
 
 	f9334_device &latch_f5(F9334(config, "latch_f5")); // F5
 	latch_f5.parallel_out_cb().set(FUNC(dragrace_state::speed1_w)).mask(0x1f); // set 3SPEED1-7SPEED1

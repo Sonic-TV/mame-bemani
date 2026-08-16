@@ -325,61 +325,67 @@ uint32_t skullxbo_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 
 	// draw and merge the MO
 	bitmap_ind16 &mobitmap = m_mob->bitmap();
-	for (const sparse_dirty_rect *rect = m_mob->first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-		for (int y = rect->top(); y <= rect->bottom(); y++)
-		{
-			uint16_t const *const mo = &mobitmap.pix(y);
-			uint16_t *const pf = &bitmap.pix(y);
-			for (int x = rect->left(); x <= rect->right(); x++)
-				if (mo[x] != 0xffff)
+	m_mob->iterate_dirty_rects(
+			cliprect,
+			[&bitmap, &mobitmap] (rectangle const &rect)
+			{
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
-					/* verified from the GALs on the real PCB; equations follow
+					uint16_t const *const mo = &mobitmap.pix(y);
+					uint16_t *const pf = &bitmap.pix(y);
+					for (int x = rect.left(); x <= rect.right(); x++)
+					{
+						if (mo[x] != 0xffff)
+						{
+							/* verified from the GALs on the real PCB; equations follow
 
-					    --- O17 is an intermediate value
-					    O17=PFPIX3*PFPAL2S*PFPAL3S
+							    --- O17 is an intermediate value
+							    O17=PFPIX3*PFPAL2S*PFPAL3S
 
-					    --- CRAM.A10 controls the high bit of the palette select; used for shadows
-					    CRAM.A10=BA11*CRAMD
-					        +!CRAMD*!LBPRI0*!LBPRI1*!O17*(LBPIX==1)*(ANPIX==0)
-					        +!CRAMD*LBPRI0*!LBPRI1*(LBPIX==1)*(ANPIX==0)*!PFPAL3S
-					        +!CRAMD*LBPRI1*(LBPIX==1)*(ANPIX==0)*!PFPAL2S*!PFPAL3S
-					        +!CRAMD*!PFPIX3*(LBPIX==1)*(ANPIX==0)
+							    --- CRAM.A10 controls the high bit of the palette select; used for shadows
+							    CRAM.A10=BA11*CRAMD
+							        +!CRAMD*!LBPRI0*!LBPRI1*!O17*(LBPIX==1)*(ANPIX==0)
+							        +!CRAMD*LBPRI0*!LBPRI1*(LBPIX==1)*(ANPIX==0)*!PFPAL3S
+							        +!CRAMD*LBPRI1*(LBPIX==1)*(ANPIX==0)*!PFPAL2S*!PFPAL3S
+							        +!CRAMD*!PFPIX3*(LBPIX==1)*(ANPIX==0)
 
-					    --- SA and SB are the mux select lines:
-					    ---     0 = motion objects
-					    ---     1 = playfield
-					    ---     2 = alpha
-					    ---     3 = color RAM access from CPU
-					    !SA=!CRAMD*(ANPIX!=0)
-					        +!CRAMD*!LBPRI0*!LBPRI1*!O17*(LBPIX!=1)*(LBPIX!=0)
-					        +!CRAMD*LBPRI0*!LBPRI1*(LBPIX!=1)*(LBPIX!=0)*!PFPAL3S
-					        +!CRAMD*LBPRI1*(LBPIX!=1)*(LBPIX!=0)*!PFPAL2S*!PFPAL3S
-					        +!CRAMD*!PFPIX3*(LBPIX!=1)*(LBPIX!=0)
+							    --- SA and SB are the mux select lines:
+							    ---     0 = motion objects
+							    ---     1 = playfield
+							    ---     2 = alpha
+							    ---     3 = color RAM access from CPU
+							    !SA=!CRAMD*(ANPIX!=0)
+							        +!CRAMD*!LBPRI0*!LBPRI1*!O17*(LBPIX!=1)*(LBPIX!=0)
+							        +!CRAMD*LBPRI0*!LBPRI1*(LBPIX!=1)*(LBPIX!=0)*!PFPAL3S
+							        +!CRAMD*LBPRI1*(LBPIX!=1)*(LBPIX!=0)*!PFPAL2S*!PFPAL3S
+							        +!CRAMD*!PFPIX3*(LBPIX!=1)*(LBPIX!=0)
 
-					    !SB=!CRAMD*(ANPIX==0)
-					        +!CRAMD*LBMISC*(LBPIX!=0)
+							    !SB=!CRAMD*(ANPIX==0)
+							        +!CRAMD*LBMISC*(LBPIX!=0)
 
-					*/
-					int const mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
-					int const mopix = mo[x] & 0x1f;
-					int const pfcolor = (pf[x] >> 4) & 0x0f;
-					int const pfpix = pf[x] & 0x0f;
-					int const o17 = ((pf[x] & 0xc8) == 0xc8);
+							*/
+							int const mopriority = mo[x] >> atari_motion_objects_device::PRIORITY_SHIFT;
+							int const mopix = mo[x] & 0x1f;
+							int const pfcolor = (pf[x] >> 4) & 0x0f;
+							int const pfpix = pf[x] & 0x0f;
+							int const o17 = ((pf[x] & 0xc8) == 0xc8);
 
-					// implement the equations
-					if ((mopriority == 0 && !o17 && mopix >= 2) ||
-						(mopriority == 1 && mopix >= 2 && !(pfcolor & 0x08)) ||
-						((mopriority & 2) && mopix >= 2 && !(pfcolor & 0x0c)) ||
-						(!(pfpix & 8) && mopix >= 2))
-						pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
+							// implement the equations
+							if ((mopriority == 0 && !o17 && mopix >= 2) ||
+								(mopriority == 1 && mopix >= 2 && !(pfcolor & 0x08)) ||
+								((mopriority & 2) && mopix >= 2 && !(pfcolor & 0x0c)) ||
+								(!(pfpix & 8) && mopix >= 2))
+								pf[x] = mo[x] & atari_motion_objects_device::DATA_MASK;
 
-					if ((mopriority == 0 && !o17 && mopix == 1) ||
-						(mopriority == 1 && mopix == 1 && !(pfcolor & 0x08)) ||
-						((mopriority & 2) && mopix == 1 && !(pfcolor & 0x0c)) ||
-						(!(pfpix & 8) && mopix == 1))
-						pf[x] |= 0x400;
+							if ((mopriority == 0 && !o17 && mopix == 1) ||
+								(mopriority == 1 && mopix == 1 && !(pfcolor & 0x08)) ||
+								((mopriority & 2) && mopix == 1 && !(pfcolor & 0x0c)) ||
+								(!(pfpix & 8) && mopix == 1))
+								pf[x] |= 0x400;
+						}
+					}
 				}
-		}
+			});
 
 	// add the alpha on top
 	m_alpha_tilemap->draw(screen, bitmap, cliprect, 0, 0);
@@ -611,10 +617,10 @@ void skullxbo_state::skullxbo(machine_config &config)
 	TILEMAP(config, m_playfield_tilemap, m_gfxdecode, 2, 16, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(FUNC(skullxbo_state::get_playfield_tile_info));
 	TILEMAP(config, m_alpha_tilemap, m_gfxdecode, 2, 16, 8, TILEMAP_SCAN_ROWS, 64, 31, 0).set_info_callback(FUNC(skullxbo_state::get_alpha_tile_info));
 
-	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, skullxbo_state::s_mob_config);
+	ATARI_MOTION_OBJECTS(config, m_mob, m_screen, skullxbo_state::s_mob_config);
 	m_mob->set_gfxdecode(m_gfxdecode);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_video_attributes(VIDEO_UPDATE_BEFORE_VBLANK);
 	/* note: these parameters are from published specs, not derived
 	   the board uses an SOS-2 chip to generate video signals */
@@ -626,7 +632,7 @@ void skullxbo_state::skullxbo(machine_config &config)
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ATARI_JSA_II(config, m_jsa, 0);
+	ATARI_JSA_II(config, m_jsa);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_4);
 	m_jsa->test_read_cb().set_ioport("FF5802").bit(7);
 	m_jsa->add_route(ALL_OUTPUTS, "mono", 0.8);

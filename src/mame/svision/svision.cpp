@@ -693,12 +693,11 @@ void svision_state::svision_base(machine_config &config)
 {
 	config.set_default_layout(layout_svision);
 
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	SVISION_SND(config, m_sound, 4'000'000, m_maincpu, m_bank[0]);
-	m_sound->add_route(0, "lspeaker", 0.50);
-	m_sound->add_route(1, "rspeaker", 0.50);
+	m_sound->add_route(0, "speaker", 0.50, 0);
+	m_sound->add_route(1, "speaker", 0.50, 1);
 	m_sound->irq_cb().set(FUNC(svision_state::sound_irq_w));
 
 	GENERIC_CARTSLOT(config, m_cart, generic_plain_slot, "svision_cart", "bin,ws,sv");
@@ -715,7 +714,7 @@ void svision_state::svision(machine_config &config)
 	W65C02(config, m_maincpu, 4'000'000);
 	m_maincpu->set_addrmap(AS_PROGRAM, &svision_state::program_map);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_LCD);
+	SCREEN(config, m_screen).set_lcd();
 	m_screen->set_refresh_hz(61);
 	m_screen->set_size(3+160+3, 160);
 	m_screen->set_visarea(3+0, 3+160-1, 0, 160-1);
@@ -741,7 +740,7 @@ void svision_state::svisionp(machine_config &config)
 
 	m_maincpu->set_clock(4'430'000);
 
-	m_screen->set_refresh(HZ_TO_ATTOSECONDS(50));
+	m_screen->set_refresh_hz(50);
 
 	m_palette->set_init(FUNC(svision_state::svisionp_palette));
 }
@@ -752,7 +751,7 @@ void svision_state::svisionn(machine_config &config)
 
 	m_maincpu->set_clock(3'560'000); // ?
 
-	m_screen->set_refresh(HZ_TO_ATTOSECONDS(60));
+	m_screen->set_refresh_hz(60);
 
 	m_palette->set_init(FUNC(svision_state::svisionn_palette));
 }

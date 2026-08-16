@@ -9,6 +9,8 @@
 #include "emu.h"
 #include "cmi01a.h"
 
+#include <numbers>
+
 #define VERBOSE     (0)
 #include "logmacro.h"
 
@@ -211,13 +213,11 @@ void cmi01a_device::device_reset()
 	update_filters();
 }
 
-void cmi01a_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void cmi01a_device::sound_stream_update(sound_stream &stream)
 {
 	if (m_run)
 	{
-		auto &buf = outputs[0];
-
-		for (int sampindex = 0; sampindex < buf.samples(); sampindex++)
+		for (int sampindex = 0; sampindex < stream.samples(); sampindex++)
 		{
 			double sample = s8(m_current_sample ^ 0x80); // -128..127
 			double hbn = (sample + 2*m_ha0 + m_ha1 - m_ka1 * m_hb0 - m_ka2 * m_hb1) / m_ka0;
@@ -231,7 +231,7 @@ void cmi01a_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 
 			double env = (m_env == 0) ? 0.0 : hbn * m_env; // -32768..32767 (guard against ∞ × 0 → NaN)
 			double vol = env * m_vol_latch; // -8388608..8388607
-			buf.put(sampindex, vol / 8388608);
+			stream.put(0, sampindex, vol / 8388608);
 		}
 	}
 	else
@@ -239,7 +239,6 @@ void cmi01a_device::sound_stream_update(sound_stream &stream, std::vector<read_s
 		m_ha0 = m_ha1 = 0;
 		m_hb0 = m_hb1 = 0;
 		m_hc0 = m_hc1 = 0;
-		outputs[0].fill(0);
 	}
 }
 
@@ -658,8 +657,10 @@ void cmi01a_device::update_filters()
 
 	logerror("Filter latch = %02x, octave=%x, fval=%03x, f0 = %g\n", m_flt_latch, m_octave, fval, f0);
 
-	double w1 = 2*M_PI*fc;
-	double w2 = 2*M_PI*fc*1.22474487139159; // sqrt(c1*c2 / (c3*c4)), the ratio between the two cutoff frequencies in the cmi01 configuration of the SSM2045
+	constexpr double PI = std::numbers::pi;
+
+	double w1 = 2*PI*fc;
+	double w2 = 2*PI*fc*1.22474487139159; // sqrt(c1*c2 / (c3*c4)), the ratio between the two cutoff frequencies in the cmi01 configuration of the SSM2045
 	double a1 = 1.81659021245849; // sqrt(c1*10*c2)/c1
 	double a2 = 1.48323969741913; // sqrt(c3*10*c4)/c3
 
@@ -673,7 +674,7 @@ void cmi01a_device::update_filters()
 	double mb1 = 1/(w2*w2);
 
 	// Convert to z, wrap around f0
-	double zc = 2*M_PI*f0/tan(M_PI*f0/48000);
+	double zc = 2*PI*f0/tan(PI*f0/48000);
 	double za0 = ma1 * zc*zc;
 	double za1 = ma0 * zc;
 	double zb0 = mb1 * zc*zc;

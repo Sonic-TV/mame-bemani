@@ -27,8 +27,8 @@ namespace {
 class btoads_state : public driver_device
 {
 public:
-	btoads_state(const machine_config &mconfig, device_type type, const char *tag)
-		: driver_device(mconfig, type, tag),
+	btoads_state(const machine_config &mconfig, device_type type, const char *tag) :
+		driver_device(mconfig, type, tag),
 		m_vram_fg(*this, "vram_fg%u", 0U, 0x200000U, ENDIANNESS_LITTLE),
 		m_vram_fg_data(*this, "vram_fg_data"),
 		m_vram_bg(*this, "vram_bg%u", 0U, 0x400000U, ENDIANNESS_LITTLE),
@@ -941,17 +941,16 @@ void btoads_state::btoads(machine_config &config)
 	// video hardware
 	TLC34076(config, m_tlc34076, tlc34076_device::TLC34076_6_BIT);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(VIDEO_CLOCK / 2, 640, 0, 512, 257, 0, 224);
 	m_screen->set_screen_update("maincpu", FUNC(tms34020_device::tms340x0_rgb32));
 
 	// sound hardware
-	SPEAKER(config, "lspeaker").front_left();
-	SPEAKER(config, "rspeaker").front_right();
+	SPEAKER(config, "speaker", 2).front();
 
 	BSMT2000(config, m_bsmt, SOUND_CLOCK);
-	m_bsmt->add_route(0, "lspeaker", 1.0);
-	m_bsmt->add_route(1, "rspeaker", 1.0);
+	m_bsmt->add_route(0, "speaker", 1.0, 0);
+	m_bsmt->add_route(1, "speaker", 1.0, 1);
 }
 
 

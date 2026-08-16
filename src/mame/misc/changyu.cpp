@@ -52,7 +52,7 @@ main PCB (marked 9101):
 #include "emu.h"
 
 #include "cpu/m6502/m6502.h"
-#include "cpu/mcs51/mcs51.h"
+#include "cpu/mcs51/i80c51.h"
 #include "machine/gen_latch.h"
 #include "machine/ticket.h"
 #include "sound/ay8910.h"
@@ -191,12 +191,14 @@ void changyu_state::videoram_w(offs_t offset, u8 data)
 
 void changyu2_state::mcu_cmd_w(u8 data)
 {
+	osd_printf_error("set cmd %02x at %s\n", data, machine().scheduler().time().to_string());
 	machine().scheduler().perfect_quantum(attotime::from_usec(50)); // enough time for the MCU to take the interrupt about to be triggered
 	machine().scheduler().synchronize(timer_expired_delegate(FUNC(changyu2_state::set_mcu_cmd), this), s32(u32(data)));
 }
 
 void changyu2_state::mcu_ctrl_w(u8 data)
 {
+	osd_printf_error("set ctrl %02x at %s\n", data, machine().scheduler().time().to_string());
 	// other bits unknown
 	m_hopper->motor_w(BIT(data, 4));
 	m_mcu->set_input_line(MCS51_INT0_LINE, BIT(data, 7) ? CLEAR_LINE : ASSERT_LINE);
@@ -210,6 +212,7 @@ u8 changyu2_state::mcu_status_r()
 
 u8 changyu2_state::mcu_cmd_r()
 {
+	osd_printf_error("read cmd %02x at %s\n", m_mcu_cmd, machine().scheduler().time().to_string());
 	return m_mcu_cmd;
 }
 
@@ -448,7 +451,7 @@ void changyu_state::changyu(machine_config &config)
 	I8751(config, m_mcu, XTAL(8'000'000));
 //  m_mcu->set_disable();
 
-	screen_device &screen(SCREEN(config, "screen", SCREEN_TYPE_RASTER));
+	screen_device &screen(SCREEN(config, "screen"));
 	screen.set_refresh_hz(60);
 	screen.set_vblank_time(ATTOSECONDS_IN_USEC(0));
 	screen.set_size(64*8, 32*8);
@@ -480,8 +483,9 @@ void changyu2_state::changyu2(machine_config &config)
 	m_maincpu->set_addrmap(AS_PROGRAM, &changyu2_state::main2_map);
 
 	auto &mcu(I87C51(config.replace(), m_mcu, XTAL(8'000'000)));
-	mcu.set_addrmap(AS_IO, &changyu2_state::ext2_map);
+	mcu.set_addrmap(AS_DATA, &changyu2_state::ext2_map);
 	mcu.port_in_cb<0>().set(FUNC(changyu2_state::mcu_p1_r));
+	mcu.port_out_cb<0>().set([] (u8 data) { osd_printf_error("MCU P1 %02x\n", data); });
 
 	GENERIC_LATCH_8(config, m_mcu_response_latch);
 

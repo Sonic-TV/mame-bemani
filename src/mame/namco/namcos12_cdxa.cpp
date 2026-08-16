@@ -65,6 +65,8 @@ Notes:
 
 #include "bus/ata/atapicdr.h"
 
+#include "endianness.h"
+
 // Any drive as long as the ident name starts with "TOSHIB" will do, but this is the one that's used with CDXA games specifically
 DECLARE_DEVICE_TYPE(TOSHIBA_XM6402B_CDROM, toshiba_xm6402b_cdrom_device)
 
@@ -292,7 +294,8 @@ void namcos12_cdxa_device::cdrom_cs0_w(offs_t offset, uint16_t data, uint16_t me
 
 void namcos12_cdxa_device::mb87078_gain_changed(offs_t offset, uint8_t data)
 {
-	m_lc78836m->set_output_gain(offset, m_mb87078->gain_factor_r(offset));
+	if (offset < m_lc78836m->outputs())
+		m_lc78836m->set_output_gain(offset, m_mb87078->gain_factor_r(offset));
 }
 
 void namcos12_cdxa_device::audio_dac_w(int state)

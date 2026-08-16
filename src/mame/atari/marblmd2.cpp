@@ -113,30 +113,32 @@ uint32_t marblmd2_state::screen_update(screen_device &screen, bitmap_ind16 &bitm
 		}
 	}
 
-	for (const sparse_dirty_rect *rect = m_vad->mob().first_dirty_rect(cliprect); rect != nullptr; rect = rect->next())
-	{
-		for (int y = rect->top(); y <= rect->bottom(); y++)
-		{
-			uint16_t const *const pf2 = &m_tempbitmap.pix(y);
-			uint16_t const *const mo = &mobitmap.pix(y);
-			uint16_t *const pf = &bitmap.pix(y);
-			for (int x = rect->left(); x <= rect->right(); x++)
+	m_vad->mob().iterate_dirty_rects(
+			cliprect,
+			[this, &bitmap, &mobitmap] (rectangle const &rect)
 			{
-				if (mo[x] != 0xffff)
+				for (int y = rect.top(); y <= rect.bottom(); y++)
 				{
-					if (pf2[x] & 0x80) // check against top bit of temp pf render
+					uint16_t const *const pf2 = &m_tempbitmap.pix(y);
+					uint16_t const *const mo = &mobitmap.pix(y);
+					uint16_t *const pf = &bitmap.pix(y);
+					for (int x = rect.left(); x <= rect.right(); x++)
 					{
-						if (mo[x] & 0x80)
-							pf[x] = mo[x];
-					}
-					else
-					{
-						pf[x] = mo[x] | 0x80;
+						if (mo[x] != 0xffff)
+						{
+							if (pf2[x] & 0x80) // check against top bit of temp pf render
+							{
+								if (mo[x] & 0x80)
+									pf[x] = mo[x];
+							}
+							else
+							{
+								pf[x] = mo[x] | 0x80;
+							}
+						}
 					}
 				}
-			}
-		}
-	}
+			});
 
 	return 0;
 }
@@ -329,25 +331,25 @@ void marblmd2_state::marblmd2(machine_config &config)
 
 	GFXDECODE(config, m_gfxdecode, "palette", gfx_mm2);
 
-	SCREEN(config, m_screen, SCREEN_TYPE_RASTER);
+	SCREEN(config, m_screen);
 	m_screen->set_raw(14.318181_MHz_XTAL/2, 456, 0, 336, 262, 0, 240);
 	m_screen->set_screen_update(FUNC(marblmd2_state::screen_update));
 	m_screen->set_palette("palette");
 
 	PALETTE(config, "palette").set_format(palette_device::IRGB_1555, 256).set_membits(8);
 
-	ATARI_VAD(config, m_vad, 0, m_screen);
+	ATARI_VAD(config, m_vad, m_screen);
 	m_vad->scanline_int_cb().set_inputline(m_maincpu, M68K_IRQ_4);
 	m_vad->set_xoffsets(4, 4);
 
-	ATARI_MOTION_OBJECTS(config, m_mob, 0, m_screen, marblmd2_state::s_mob_config).set_gfxdecode("gfxdecode");
+	ATARI_MOTION_OBJECTS(config, m_mob, m_screen, marblmd2_state::s_mob_config).set_gfxdecode("gfxdecode");
 
 	TILEMAP(config, "vad:playfield", "gfxdecode", 2, 8, 8, TILEMAP_SCAN_COLS, 64, 64).set_info_callback(FUNC(marblmd2_state::get_playfield_tile_info));
 
 	// sound hardware
 	SPEAKER(config, "mono").front_center();
 
-	ATARI_JSA_III(config, m_jsa, 0);
+	ATARI_JSA_III(config, m_jsa);
 	m_jsa->set_swapped_coins(true);
 	m_jsa->main_int_cb().set_inputline(m_maincpu, M68K_IRQ_6);
 	m_jsa->test_read_cb().set_ioport("600010").bit(6);

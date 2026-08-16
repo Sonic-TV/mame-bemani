@@ -52,7 +52,7 @@ public:
 	// Audio In pin, an analog value of the audio waveform being pushed to the chip.
 	// TODO: this is not hooked up or implemented yet, and this should really be handled as an
 	// input stream from a separate DAC device, not a value push function at all.
-	//void audio_in_w(stream_buffer::sample_t data);
+	//void audio_in_w(sound_stream::sample_t data);
 
 	// sets the buffered digit (0 or 1), common to all chips. TODO: replace all use of this with
 	// digin_cb once implemented
@@ -74,7 +74,7 @@ protected:
 	//virtual void device_clock_changed() override;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	// callbacks
 	devcb_write_line m_clock_state_push_cb; // TODO: get rid of this, if you use it you should feel bad
@@ -106,7 +106,7 @@ protected:
 class hc55516_device : public cvsd_device_base
 {
 public:
-	hc55516_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hc55516_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// /FZ (partial reset) pull callback, ok to leave unconnected (we assume it is pulled high)
 	auto fzq_cb() { return m_fzq_pull_cb.bind(); }
@@ -129,7 +129,7 @@ protected:
 	virtual void device_reset() override ATTR_COLD;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	// callbacks
 	devcb_write_line m_agc_push_cb;
@@ -156,7 +156,7 @@ protected:
 class hc55532_device : public hc55516_device
 {
 public:
-	hc55532_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	hc55532_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 protected:
 	// device-level overrides
 	virtual void device_reset() override ATTR_COLD;
@@ -166,7 +166,7 @@ protected:
 class mc3417_device : public cvsd_device_base
 {
 public:
-	mc3417_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mc3417_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 
 	// override for clock_w
 	//virtual void clock_w(int state) override;
@@ -179,7 +179,7 @@ protected:
 	virtual void device_start() override ATTR_COLD;
 
 	// sound stream update overrides
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 	// const coefficients defined by constructor; should these be adjustable by the user or externally defined,
 	// as they are implemented using a set of two small lowpass filters outside the chip?
@@ -190,8 +190,8 @@ protected:
 	// internal state
 	double m_sylfilter;
 	double m_intfilter;
-	stream_buffer::sample_t m_curr_sample;
-	stream_buffer::sample_t m_next_sample;
+	sound_stream::sample_t m_curr_sample;
+	sound_stream::sample_t m_next_sample;
 
 	// internal handlers
 	virtual void process_bit(bool bit, bool clock_state) override;
@@ -201,7 +201,7 @@ protected:
 class mc3418_device : public mc3417_device
 {
 public:
-	mc3418_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock);
+	mc3418_device(const machine_config &mconfig, const char *tag, device_t *owner, uint32_t clock = 0);
 };
 
 
