@@ -295,8 +295,10 @@ ifndef TARGET
 TARGET := mame
 endif
 
+# This tree only carries the Konami Bemani drivers (see src/mame/bemani.flt),
+# so default to that subtarget instead of the full mame one.
 ifndef SUBTARGET
-SUBTARGET := $(TARGET)
+SUBTARGET := bemani
 endif
 
 SUBTARGET_FULL := $(subst -,_,$(SUBTARGET))

@@ -202,7 +202,7 @@ void tc9446f_device::fill_buffer()
 	cb_demand(mp3data_count < mp3data.size());
 }
 
-void tc9446f_device::append_buffer(std::vector<write_stream_view>& outputs, int& pos, int scount)
+void tc9446f_device::append_buffer(sound_stream &stream, int& pos, int scount)
 {
 	int s1 = scount - pos;
 	int bytes_per_sample = std::min(frame_channels, 2); // More than 2 channels is unsupported here
@@ -211,8 +211,8 @@ void tc9446f_device::append_buffer(std::vector<write_stream_view>& outputs, int&
 		s1 = sample_count;
 
 	for (int i = 0; i < s1; i++) {
-		outputs[0].put_int(pos, samples[samples_idx * bytes_per_sample], 32768);
-		outputs[1].put_int(pos, samples[samples_idx * bytes_per_sample + (bytes_per_sample >> 1)], 32768);
+		stream.put_int(0, pos, samples[samples_idx * bytes_per_sample], 32768);
+		stream.put_int(1, pos, samples[samples_idx * bytes_per_sample + (bytes_per_sample >> 1)], 32768);
 
 		samples_idx++;
 		pos++;
@@ -238,21 +238,19 @@ void tc9446f_device::reset_playback()
 	cb_demand(mp3data_count < mp3data.size());
 }
 
-void tc9446f_device::sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs)
+void tc9446f_device::sound_stream_update(sound_stream &stream)
 {
-	int csamples = outputs[0].samples();
+	int csamples = stream.samples();
 	int pos = 0;
 
 	while (pos < csamples) {
 		if (sample_count == 0)
 			fill_buffer();
 
-		if (sample_count <= 0) {
-			outputs[0].fill(0, pos);
-			outputs[1].fill(0, pos);
+		// remaining samples are left at zero, which the stream is already filled with
+		if (sample_count <= 0)
 			return;
-		}
 
-		append_buffer(outputs, pos, csamples);
+		append_buffer(stream, pos, csamples);
 	}
 }

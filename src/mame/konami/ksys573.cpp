@@ -1721,12 +1721,10 @@ void ddr_state::ddr_output_callback(offs_t offset, uint8_t data)
 
 	case 17:
 		m_output_lamps[0] = data ? 0 : 1; // start 1
-		output().set_value( "start 1p", !data );
 		break;
 
 	case 18:
 		m_output_lamps[1] = data ? 0 : 1; // start 2
-		output().set_value( "start 2p", !data );
 		break;
 
 	case 20:

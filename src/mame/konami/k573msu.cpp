@@ -182,26 +182,26 @@ void k573msu_device::device_add_mconfig(machine_config &config)
 	auto& dsp0(TC9446F(config, "dsp_0", 0));
 	dsp0.mpeg_frame_sync_cb().set(*this, FUNC(k573msu_device::mpeg_frame_sync<0>));
 	dsp0.demand_cb().set(*this, FUNC(k573msu_device::audio_demand<0>));
-	dsp0.add_route(0, ":lspeaker", 0.65);
-	dsp0.add_route(1, ":rspeaker", 0.65);
+	dsp0.add_route(0, ":speaker", 0.65, 0);
+	dsp0.add_route(1, ":speaker", 0.65, 1);
 
 	auto& dsp1(TC9446F(config, "dsp_1", 0));
 	dsp1.mpeg_frame_sync_cb().set(*this, FUNC(k573msu_device::mpeg_frame_sync<1>));
 	dsp1.demand_cb().set(*this, FUNC(k573msu_device::audio_demand<1>));
-	dsp1.add_route(0, ":lspeaker", 0.65);
-	dsp1.add_route(1, ":rspeaker", 0.65);
+	dsp1.add_route(0, ":speaker", 0.65, 0);
+	dsp1.add_route(1, ":speaker", 0.65, 1);
 
 	auto& dsp2(TC9446F(config, "dsp_2", 0));
 	dsp2.mpeg_frame_sync_cb().set(*this, FUNC(k573msu_device::mpeg_frame_sync<2>));
 	dsp2.demand_cb().set(*this, FUNC(k573msu_device::audio_demand<2>));
-	dsp2.add_route(0, ":lspeaker", 0.65);
-	dsp2.add_route(1, ":rspeaker", 0.65);
+	dsp2.add_route(0, ":speaker", 0.65, 0);
+	dsp2.add_route(1, ":speaker", 0.65, 1);
 
 	auto& dsp3(TC9446F(config, "dsp_3", 0));
 	dsp3.mpeg_frame_sync_cb().set(*this, FUNC(k573msu_device::mpeg_frame_sync<3>));
 	dsp3.demand_cb().set(*this, FUNC(k573msu_device::audio_demand<3>));
-	dsp3.add_route(0, ":lspeaker", 0.65);
-	dsp3.add_route(1, ":rspeaker", 0.65);
+	dsp3.add_route(0, ":speaker", 0.65, 0);
+	dsp3.add_route(1, ":speaker", 0.65, 1);
 
 	TIMER(config, "fifo_timer").configure_periodic(FUNC(k573msu_device::fifo_timer_callback), attotime::from_hz(1000));
 }

@@ -1051,7 +1051,7 @@ TIMER_DEVICE_CALLBACK_MEMBER(k573dio_device::network_update_callback)
 		auto packet = m_network_buffer_output_queue.front();
 		m_network_buffer_output_queue.pop_front();
 
-		for (auto n : m_network) {
+		for (auto &n : m_network) {
 			if (!n->exists()) {
 				continue;
 			}

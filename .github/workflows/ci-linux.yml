@@ -33,13 +33,13 @@ jobs:
             cc: gcc
             cxx: g++
             archopts: -U_FORTIFY_SOURCE
-            subtarget: tiny
-            executable: mametiny
+            subtarget: bemani
+            executable: mamebemani
           - compiler: clang
             cc: clang
             cxx: clang++
-            subtarget: mame
-            executable: mame
+            subtarget: bemani
+            executable: mamebemani
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@main
@@ -63,7 +63,7 @@ jobs:
     - name: Validate
       run: ./${{ matrix.executable }} -validate
     - name: Reconcile driver list
-      run: ./${{ matrix.executable }} -listxml | python scripts/build/makedep.py reconcilelist -l src/mame/${{ matrix.subtarget }}.lst -
+      run: ./${{ matrix.executable }} -listxml | python scripts/build/makedep.py reconcilelist -l src/mame/mame.lst -
     - name: ORM check
       run: python scripts/minimaws/minimaws.py load --executable ./${{ matrix.executable }} --softwarepath hash
     - uses: actions/upload-artifact@main

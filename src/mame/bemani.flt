@@ -1,0 +1,12 @@
+// license:CC0-1.0
+// copyright-holders:MAMEdev Team
+
+// Konami Bemani-only build.
+// Drivers kept in this fork; everything else in src/mame is filtered out.
+
+konami/djmain.cpp    // Beatmania (DJ Main hardware)
+konami/twinkle.cpp   // Beatmania IIDX (Twinkle)
+konami/ksys573.cpp   // System 573 (DDR, GuitarFreaks, DrumMania, Pop'n Music, ...)
+konami/firebeat.cpp  // Firebeat (Keyboardmania, ParaParaParadise, Beatmania III, ...)
+konami/kpython2.cpp  // Python 2 (DDR SuperNOVA, ...)
+konami/viper.cpp     // Viper (ParaParaParadise 2nd Mix, ...)

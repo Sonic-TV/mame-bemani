@@ -34,8 +34,8 @@ jobs:
             slug: mingw-w64-ucrt-x86_64
             cc: gcc
             cxx: g++
-            subtarget: mame
-            executable: mame
+            subtarget: bemani
+            executable: mamebemani
           - compiler: clang-x64
             os: windows-latest
             msys: CLANG64
@@ -43,8 +43,8 @@ jobs:
             extrapkg: mingw-w64-clang-x86_64-gcc-compat
             cc: clang
             cxx: clang++
-            subtarget: tiny
-            executable: mametiny
+            subtarget: bemani
+            executable: mamebemani
           - compiler: clang-arm64
             os: windows-11-arm
             msys: CLANGARM64
@@ -52,8 +52,8 @@ jobs:
             extrapkg: mingw-w64-clang-aarch64-gcc-compat
             cc: clang
             cxx: clang++
-            subtarget: mame
-            executable: mame
+            subtarget: bemani
+            executable: mamebemani
     runs-on: ${{ matrix.os }}
     defaults:
       run:

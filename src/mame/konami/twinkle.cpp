@@ -321,6 +321,7 @@ public:
 		m_credit_lamp(*this, "credit"),
 		m_neon_lamp(*this, "neonlamp"),
 		m_unknown_outputs(*this, "unknown%u", 1U),
+		m_vol_outputs(*this, "vol%u", 1U),
 		m_spu_ata_dma(0),
 		m_spu_ata_dmarq(0),
 		m_wave_bank(0)
@@ -390,6 +391,7 @@ private:
 	output_finder<> m_credit_lamp;
 	output_finder<> m_neon_lamp;
 	output_finder<4> m_unknown_outputs;
+	output_finder<5> m_vol_outputs;
 
 	emu_timer *m_dma_timer = nullptr;
 
@@ -832,19 +834,19 @@ uint8_t twinkle_state::twinkle_io_r(offs_t offset)
 
 			case 0x1f:
 				data = m_in[3]->read();
-				output().set_value("vol1", data & 0x0f);
-				output().set_value("vol2", (data >> 4) & 0x0f);
+				m_vol_outputs[0] = data & 0x0f;
+				m_vol_outputs[1] = (data >> 4) & 0x0f;
 				break;
 
 			case 0x27:
 				data = m_in[4]->read();
-				output().set_value("vol3", data & 0x0f);
-				output().set_value("vol4", (data >> 4) & 0x0f);
+				m_vol_outputs[2] = data & 0x0f;
+				m_vol_outputs[3] = (data >> 4) & 0x0f;
 				break;
 
 			case 0x2f:
 				data = m_in[5]->read();
-				output().set_value("vol5", data & 0x0f);
+				m_vol_outputs[4] = data & 0x0f;
 				break;
 
 			default:

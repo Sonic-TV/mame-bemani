@@ -37,7 +37,7 @@ protected:
 	virtual void device_start() override;
 	virtual void device_reset() override;
 
-	virtual void sound_stream_update(sound_stream &stream, std::vector<read_stream_view> const &inputs, std::vector<write_stream_view> &outputs) override;
+	virtual void sound_stream_update(sound_stream &stream) override;
 
 private:
 	std::unique_ptr<mp3_audio> mp3dec;
@@ -45,7 +45,7 @@ private:
 	int mp3_find_frame(int offset);
 	void stream_update();
 	void fill_buffer();
-	void append_buffer(std::vector<write_stream_view>& outputs, int& pos, int scount);
+	void append_buffer(sound_stream &stream, int& pos, int scount);
 
 	float gain_to_percentage(int val);
 
